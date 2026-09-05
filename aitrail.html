@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AI Buildout Trail</title>
+<link rel="stylesheet" href="arcade.css">
+<style>
+  body{font-family:"Courier New", ui-monospace, monospace}
+  .wrap{width:min(96vw, 900px)}
+  .screen{
+    background:#08160f;
+    border:3px solid #1f6b45;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 0 40px rgba(61,220,151,.12) inset, 0 10px 30px rgba(0,0,0,.5);
+  }
+  .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+       color:#7ee8b5;font-size:14px;letter-spacing:1px;margin-bottom:10px}
+  .trail{
+    position:relative;height:26px;background:#0d2318;border:2px solid #1f6b45;
+    border-radius:6px;margin-bottom:14px;overflow:hidden;
+  }
+  .trail .fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,#1f6b45,#3ddc97);
+               transition:width .4s}
+  .trail .mark{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.28)}
+  .trail .you{position:absolute;top:2px;font-size:16px;transition:left .4s}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+  .stat{background:#0d2318;border:2px solid #1f6b45;border-radius:8px;padding:7px 9px}
+  .stat .nm{font-size:11px;color:#7ee8b5;letter-spacing:1px;display:flex;justify-content:space-between}
+  .bar{height:9px;background:#08160f;border-radius:4px;margin-top:5px;overflow:hidden}
+  .bar i{display:block;height:100%;transition:width .35s}
+  .money{display:flex;gap:18px;flex-wrap:wrap;color:#3ddc97;font-size:15px;
+         margin-bottom:12px;font-weight:bold}
+  .money .debt{color:#ff9f43}
+  .money .bad{color:#ff6b6b}
+  .recap{
+    background:#0a1d14;border:2px solid #1f6b45;border-left:6px solid #3ddc97;
+    border-radius:8px;padding:8px 12px;margin-bottom:10px;
+    color:#7ee8b5;font-size:12.5px;letter-spacing:.4px;line-height:1.6;
+  }
+  .recap:empty{display:none}
+  .recap b{color:#ffd166}
+  .recap .up{color:#3ddc97}
+  .recap .down{color:#ff9f43}
+  .story{
+    background:#0d2318;border:2px solid #1f6b45;border-radius:10px;
+    padding:14px 16px;min-height:120px;color:#d7ffe9;font-size:15px;line-height:1.65;
+    margin-bottom:14px;white-space:pre-wrap;
+  }
+  .story h3{margin:0 0 8px;color:#ffd166;font-size:17px;letter-spacing:1px}
+  .story .ev{color:#ffd166}
+  .story .good{color:#3ddc97}
+  .story .bad{color:#ff9f43}
+  .choices{display:grid;gap:9px}
+  .choice{
+    text-align:left;background:#123a26;border:2px solid #2a8a58;border-radius:9px;
+    padding:11px 14px;color:#d7ffe9;font-family:inherit;font-size:14px;cursor:pointer;
+    box-shadow:none;font-weight:normal;line-height:1.5;
+  }
+  .choice:hover{background:#1a5236;border-color:#3ddc97}
+  .choice b{color:#ffd166;display:block;margin-bottom:2px;font-size:15px}
+  .choice .cost{color:#7ee8b5;font-size:12.5px}
+  .log{
+    margin-top:14px;max-height:132px;overflow-y:auto;font-size:12.5px;color:#5fae86;
+    border-top:2px solid #1f6b45;padding-top:9px;line-height:1.6;
+  }
+  .ending{text-align:center}
+  .ending h2{font-size:26px;margin:6px 0 10px;letter-spacing:1px}
+  .endno{font-size:12px;letter-spacing:3px;color:#5fae86;margin-bottom:4px}
+  .pillars{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+  .pillar{font-size:12px;letter-spacing:1px;border-radius:20px;padding:5px 13px;border:2px solid}
+  .pillar.yes{color:#3ddc97;border-color:#2a8a58;background:rgba(61,220,151,.10)}
+  .pillar.no{color:#ff8f6b;border-color:#7a3a2a;background:rgba(255,107,107,.10)}
+  .ending .score{font-size:15px;color:#7ee8b5;margin-bottom:12px}
+</style>
+</head>
+<body>
+<a class="back btn" href="NARRATIVE.md">&larr; Research</a>
+<h1>The AI Buildout Trail</h1>
+<p class="sub">You're leading the buildout. Get there without wrecking what you're building it for.</p>
+
+<div class="wrap screen">
+  <div class="top">
+    <div>YEAR <span id="year">2026</span></div>
+    <div>LEG <span id="leg">1</span> / 20</div>
+    <div id="nextMark">NEXT: First Datacenter</div>
+  </div>
+
+  <div class="trail" id="trail">
+    <div class="fill" id="trailFill"></div>
+    <div class="you" id="trailYou">🚚</div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div class="money" id="money"></div>
+
+  <div class="recap" id="recap"></div>
+  <div class="story" id="story"></div>
+  <div class="choices" id="choices"></div>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+/* =================================================================
+   The AI Buildout Trail - an Oregon Trail-shaped resource game about
+   scaling AI without wrecking the water, the grid, the public's trust,
+   your balance sheet, your people, or your ability to steer the thing.
+   The winning path is the sustainable, honest, well-aligned one.
+   ================================================================= */
+
+const $ = id => document.getElementById(id);
+
+const STATS = [
+  {k:"water",     nm:"WATERSHED",  c:"#5bc0eb", low:"The aquifer is dropping fast."},
+  {k:"grid",      nm:"CLEAN GRID", c:"#ffd166", low:"Power bills in town are spiking."},
+  {k:"trust",     nm:"PUBLIC TRUST", c:"#3ddc97", low:"The town is turning against you."},
+  {k:"alignment", nm:"ALIGNMENT",  c:"#c77dff", low:"Nobody fully understands the model."},
+  {k:"team",      nm:"TEAM",       c:"#ff9770", low:"Your people are exhausted."}
+];
+
+const LANDMARKS = [
+  {at:0,   nm:"Groundbreaking"},
+  {at:18,  nm:"First Datacenter"},
+  {at:42,  nm:"Model v2"},
+  {at:70,  nm:"Regional Grid Tie-In"},
+  {at:100, nm:"Open Benchmarks"},
+  {at:132, nm:"The Public Hearing"},
+  {at:166, nm:"Global Safety Summit"}
+];
+const GOAL = 200;
+const MAX_TURNS = 20;
+const TOTAL_ENDINGS = 12;
+
+let S, turn, phase, pendingPace, ended;
+
+function newGame(){
+  S = {
+    water:80, grid:70, trust:65, alignment:55, team:70,
+    capital:500, debt:0, compute:0, revenue:0,
+    seenLandmark:0, incidents:0, cutCorners:0, kindness:0, cursor:{}, usedEvents:[]
+  };
+  turn = 1;
+  ended = false;
+  S.snap = null;
+  $("recap").innerHTML = "";
+  pendingPace = null;
+  $("log").innerHTML = "";
+  log("2026. You have a permit, a plot of land, and a promise to keep.");
+  askPace();
+  render();
+}
+
+const clamp = v => Math.max(0, Math.min(100, v));
+
+const STAT_NAMES = {water:"Watershed", grid:"Grid", trust:"Trust",
+                    alignment:"Alignment", team:"Team"};
+
+function snapshot(){
+  const o = {compute:S.compute, capital:S.capital};
+  for(const k in STAT_NAMES) o[k] = S[k];
+  return o;
+}
+
+/* A short "here is what your last two choices actually did" line, so each new
+   leg is obviously a new leg and not the game starting over. */
+function showRecap(){
+  if(!S.snap){ $("recap").innerHTML = ""; return; }
+  const parts = [];
+  const dc = Math.round(S.compute - S.snap.compute);
+  const dm = Math.round(S.capital - S.snap.capital);
+  parts.push('compute <b>' + (dc >= 0 ? "+" : "") + dc + '</b>');
+  parts.push('money <span class="' + (dm >= 0 ? "up" : "down") + '">' +
+             (dm >= 0 ? "+$" : "-$") + Math.abs(dm) + 'M</span>');
+  for(const k in STAT_NAMES){
+    const d = Math.round(S[k] - S.snap[k]);
+    if(!d) continue;
+    parts.push(STAT_NAMES[k] + ' <span class="' + (d > 0 ? "up" : "down") + '">' +
+               (d > 0 ? "+" : "") + d + '</span>');
+  }
+  $("recap").innerHTML = "LEG " + (turn - 1) + " RESULT &nbsp;·&nbsp; " + parts.join(" &nbsp;·&nbsp; ");
+}
+
+function apply(d, why){
+  for(const k of ["water","grid","trust","alignment","team"])
+    if(d[k]) S[k] = clamp(S[k] + d[k]);
+  if(d.capital) S.capital += d.capital;
+  if(d.debt)    S.debt    += d.debt;
+  if(d.compute) S.compute += d.compute;
+  if(why) log(why);
+}
+
+function log(msg){
+  const d = document.createElement("div");
+  d.textContent = "› " + msg;
+  $("log").appendChild(d);
+  $("log").scrollTop = $("log").scrollHeight;
+}
+
+/* ---------------- rendering ---------------- */
+
+function render(){
+  $("year").textContent = 2026 + Math.floor((turn-1) / 1.6);
+  $("leg").textContent = Math.min(turn, 20);
+
+  const next = LANDMARKS.find(l => l.at > S.compute);
+  $("nextMark").textContent = next ? "NEXT: " + next.nm.toUpperCase() : "NEXT: HANDOVER";
+
+  const pct = Math.min(100, S.compute / GOAL * 100);
+  $("trailFill").style.width = pct + "%";
+  $("trailYou").style.left = "calc(" + pct + "% - 10px)";
+
+  const tr = $("trail");
+  tr.querySelectorAll(".mark").forEach(m => m.remove());
+  LANDMARKS.forEach(l => {
+    if(l.at === 0) return;
+    const m = document.createElement("div");
+    m.className = "mark";
+    m.style.left = (l.at / GOAL * 100) + "%";
+    tr.appendChild(m);
+  });
+
+  $("stats").innerHTML = STATS.map(st => {
+    const v = Math.round(S[st.k]);
+    const col = v < 25 ? "#ff6b6b" : v < 45 ? "#ff9f43" : st.c;
+    return '<div class="stat"><div class="nm"><span>' + st.nm + '</span><span>' + v + '</span></div>' +
+           '<div class="bar"><i style="width:' + v + '%;background:' + col + '"></i></div></div>';
+  }).join("");
+
+  const netCls = S.capital < 0 ? "bad" : "";
+  $("money").innerHTML =
+    '<div class="' + netCls + '">CAPITAL $' + Math.round(S.capital) + 'M</div>' +
+    '<div class="debt">DEBT $' + Math.round(S.debt) + 'M</div>' +
+    '<div>COMPUTE ' + Math.round(S.compute) + ' / ' + GOAL + '</div>';
+}
+
+function show(title, body, cls){
+  $("story").innerHTML = "<h3>" + title + "</h3>" +
+    '<span class="' + (cls || "") + '">' + body + "</span>";
+}
+
+function choices(list){
+  const el = $("choices");
+  el.innerHTML = "";
+  list.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.innerHTML = "<b>" + c.label + "</b>" +
+      (c.desc ? '<span class="cost">' + c.desc + "</span>" : "");
+    b.onclick = () => { if(!ended) c.go(); };
+    el.appendChild(b);
+  });
+}
+
+/* ---------------- turn: pace ---------------- */
+
+const PACES = [
+  {label:"Careful pace", cost:35,
+   desc:"+10 compute · easy on the water and grid · the town stays with you · $35M",
+   d:{compute:10, water:-2, grid:-2, trust:+2, alignment:+2, team:+1}, corner:0},
+  {label:"Steady pace", cost:60,
+   desc:"+15 compute · a fair trade all round · $60M",
+   d:{compute:15, water:-5, grid:-5, trust:0, alignment:0, team:-1}, corner:0},
+  {label:"Breakneck pace", cost:100,
+   desc:"+23 compute · burns water, power, goodwill and people · $100M",
+   d:{compute:23, water:-11, grid:-11, trust:-6, alignment:-4, team:-6}, corner:1}
+];
+
+const PACE_TEXT = [
+  "Every hall you pour needs water to cool it and power to run it, and both come from the town "
+  + "next door. Go fast and you get there first. Go careful and you get to stay.",
+  "The utility says your interconnection request is now in a queue behind eleven others. Some "
+  + "of those are yours from last quarter.",
+  "A neighbouring county just froze all new datacenter permits for two years. Yours is the "
+  + "example everyone cited at the hearing.",
+  "Your quarterly water disclosure comes out Friday. Legal wants it delayed. The hydrologist "
+  + "wants it early.",
+  "The regional capacity auction cleared at a record price. Three newspapers ran the same "
+  + "graph of your load next to everyone's bill.",
+  "A rival ships a model nearly as good as yours, trained for a tenth of the money, and gives "
+  + "the weights away. The moat you were digging just filled in.",
+  "Your GPU order slips two quarters. Everyone's did. The question is what you cut to catch up.",
+  "Halfway. The early decisions are load-bearing now, and the ones you rushed are creaking.",
+  "The county assessor's office calls: your tax abatement expires next year and the school "
+  + "district has questions.",
+  "An outside institute asks for pre-deployment access to test the next model. They will "
+  + "publish either way.",
+  "Cooling fans on Hall Three register 58 decibels at the property line. Four families have "
+  + "filed complaints.",
+  "The grid operator asks large loads to voluntarily curtail during next week's cold snap.",
+  "Your model is now inside hospitals, school districts and a state benefits system. A bad "
+  + "week costs more than money.",
+  "Two of your safety leads got offers this month at four times the pay. One has already gone.",
+  "A national election is coming and both sides have opinions about datacenters. Neither has "
+  + "read your water report.",
+  "Interpretability finally has traction: the team can point at what the model is doing and "
+  + "explain it in sentences. It is slow, expensive, and working.",
+  "Insurers want a rider excluding 'autonomous system behaviour'. Your lawyers say sign it. "
+  + "Your engineers say that should worry you.",
+  "The last big pour. After this it is tuning, evaluation, and whatever promises you kept.",
+  "Handover planning starts. Someone asks who actually owns this thing when you're gone.",
+  "The last stretch. Whatever you are when you arrive is what this becomes."
+];
+
+function askPace(){
+  showRecap();
+  S.snap = snapshot();
+  const phase = Math.min(PACE_TEXT.length - 1, turn - 1);
+  const pct = Math.round(S.compute / GOAL * 100);
+  show("LEG " + turn + " OF " + MAX_TURNS + " \u00b7 " + (2026 + Math.floor((turn-1)/1.6)) +
+       " \u2014 how hard do you push?",
+       PACE_TEXT[phase] + "\n\nYou are " + Math.round(S.compute) + " of " + GOAL +
+       " compute along the trail (" + pct + "%).");
+  choices(PACES.map(p => ({
+    label: p.label, desc: p.desc,
+    go: () => {
+      pendingPace = p;
+      S.cutCorners += p.corner;
+      apply({...p.d, capital: -p.cost});
+      askInvest();
+      render();
+    }
+  })));
+}
+
+/* ---------------- turn: investment ---------------- */
+
+const INVEST_POOL = [
+  /* --- water --- */
+  {stat:"water", label:"Closed-loop liquid cooling", cost:90, d:{water:+16, trust:+4},
+   desc:"Recycle the coolant instead of evaporating it. WATERSHED +16, TRUST +4"},
+  {stat:"water", label:"Buy reclaimed wastewater from the city", cost:80, d:{water:+14, trust:+6},
+   desc:"Cool with water nobody was drinking. WATERSHED +14, TRUST +6"},
+  {stat:"water", label:"Air-cooled halls on the cold-climate site", cost:105, d:{water:+19, grid:-4},
+   desc:"Almost no water, rather more power. WATERSHED +19, CLEAN GRID -4"},
+  {stat:"water", label:"Fund aquifer recharge with the farm co-op", cost:85, d:{water:+13, trust:+8},
+   desc:"Put back more than you take. WATERSHED +13, TRUST +8"},
+
+  /* --- grid --- */
+  {stat:"grid", label:"Solar plus four-hour storage", cost:110, d:{grid:+17, trust:+3},
+   desc:"Bring your own power. CLEAN GRID +17, TRUST +3"},
+  {stat:"grid", label:"Restart the shuttered nuclear plant", cost:150, d:{grid:+24, trust:+6},
+   desc:"Expensive, slow, and it powers the whole valley. CLEAN GRID +24, TRUST +6"},
+  {stat:"grid", label:"Sign a geothermal power agreement", cost:120, d:{grid:+19, water:+3},
+   desc:"Firm clean power, no fuel. CLEAN GRID +19, WATERSHED +3"},
+  {stat:"grid", label:"Agree to curtail on peak days", cost:45, d:{grid:+11, trust:+8, compute:-3},
+   desc:"Throttle yourself when the grid is strained. CLEAN GRID +11, TRUST +8, -3 compute"},
+  {stat:"grid", label:"Order small modular reactors", cost:160, d:{grid:+22, trust:+4},
+   desc:"Years out, but it is real generation. CLEAN GRID +22, TRUST +4"},
+  {stat:"grid", label:"Waste-heat loop for the town's district heating", cost:75, d:{grid:+12, trust:+9},
+   desc:"Your exhaust heats their houses. CLEAN GRID +12, TRUST +9"},
+
+  /* --- trust --- */
+  {stat:"trust", label:"Community benefit agreement, in writing", cost:70, d:{trust:+15, team:+3},
+   desc:"Jobs, bills, a rebuilt school - enforceable. TRUST +15, TEAM +3"},
+  {stat:"trust", label:"Publish water and power figures monthly", cost:35, d:{trust:+12, water:+3},
+   desc:"Before anyone has to ask. TRUST +12, WATERSHED +3"},
+  {stat:"trust", label:"Decline the tax abatement", cost:95, d:{trust:+17},
+   desc:"Pay the county what everyone else pays. TRUST +17"},
+  {stat:"trust", label:"Pay for the transmission line yourself", cost:130, d:{trust:+16, grid:+8},
+   desc:"Keep it off everyone's bill. TRUST +16, CLEAN GRID +8"},
+  {stat:"trust", label:"Fund noise abatement and buy back the quiet", cost:55, d:{trust:+11},
+   desc:"Baffles, berms, and honest measurements. TRUST +11"},
+
+  /* --- alignment --- */
+  {stat:"alignment", label:"Build the interpretability team", cost:85, d:{alignment:+16},
+   desc:"Understand what it is doing, not just that it works. ALIGNMENT +16"},
+  {stat:"alignment", label:"Independent red team with real model access", cost:75, d:{alignment:+14, trust:+5},
+   desc:"People whose job is to break it, who don't report to you. ALIGNMENT +14, TRUST +5"},
+  {stat:"alignment", label:"Pre-deployment evals with an outside institute", cost:70, d:{alignment:+13, trust:+7},
+   desc:"They test it before release and publish either way. ALIGNMENT +13, TRUST +7"},
+  {stat:"alignment", label:"Incident reporting and rollback drills", cost:60, d:{alignment:+12, team:+3},
+   desc:"Practise switching it off before you need to. ALIGNMENT +12, TEAM +3"},
+
+  /* --- team --- */
+  {stat:"team", label:"Hire ahead of the crunch", cost:60, d:{team:+16, alignment:+2},
+   desc:"More hands before the deadline, not after. TEAM +16, ALIGNMENT +2"},
+  {stat:"team", label:"A real on-call rotation", cost:50, d:{team:+14},
+   desc:"Nobody carries the pager for six months straight. TEAM +14"},
+  {stat:"team", label:"Ring-fence the safety team's headcount", cost:65, d:{team:+12, alignment:+7},
+   desc:"They cannot be borrowed for launch work. TEAM +12, ALIGNMENT +7"}
+];
+
+const ALWAYS = [
+  {stat:"debt", label:"Borrow $200M", cost:0, d:{capital:+200, debt:+200},
+   desc:"Cash now, interest forever. CAPITAL +200, DEBT +200"},
+  {stat:"none", label:"Spend nothing this leg", cost:0, d:{team:+2},
+   desc:"Bank it. A little breathing room for the team."}
+];
+
+/* A different slate every leg: always something for your weakest stat,
+   plus two rotating others, so the menu is never the same twice. */
+function investOffers(){
+  const byStat = {};
+  for(const iv of INVEST_POOL) (byStat[iv.stat] ||= []).push(iv);
+
+  const stats = ["water","grid","trust","alignment","team"];
+  const weakest = stats.slice().sort((a,b) => S[a] - S[b])[0];
+  const others  = stats.filter(k => k !== weakest);
+  const pick2 = [others[turn % others.length], others[(turn + 2) % others.length]];
+  const chosen = [...new Set([weakest, ...pick2])].slice(0, 3);
+
+  return chosen.map(k => {
+    const list = byStat[k];
+    const iv = list[(S.cursor[k] || 0) % list.length];
+    S.cursor[k] = (S.cursor[k] || 0) + 1;   // different wording next time
+    return iv;
+  }).concat(ALWAYS);
+}
+
+function askInvest(){
+  show("LEG " + turn + " — where does the money go?",
+       "You have $" + Math.round(S.capital) + "M on hand" +
+       (S.debt > 0 ? " and $" + Math.round(S.debt) + "M of debt" : "") +
+       ". Spending more than you have is allowed — the bank is always happy to help. " +
+       "That is the trap.");
+  choices(investOffers().map(iv => ({
+    label: iv.label,
+    stat: iv.stat,
+    desc: iv.desc + (iv.cost > 0 ? "  · $" + iv.cost + "M" : "") +
+          (iv.cost > S.capital && iv.cost > 0 ? "  ⚠ you'd have to borrow" : ""),
+    go: () => {
+      if(iv.cost > 0){
+        if(iv.cost > S.capital){
+          const short = iv.cost - S.capital;
+          S.debt += short + 20;
+          S.capital += short + 20;
+          log("Short by $" + Math.round(short) + "M - you took emergency credit.");
+        }
+        S.capital -= iv.cost;
+      }
+      if(iv.stat !== "debt" && iv.stat !== "none") S.kindness++;
+      apply(iv.d);
+      afterChoices();
+    }
+  })));
+}
+
+/* ---------------- events ---------------- */
+
+const EVENTS = [
+  {id:"drought", w:s => s.water < 55 ? 4 : 1,
+   title:"The wells run low",
+   text:"Three farms downstream come up dry the same week your cooling towers hit full load. " +
+        "The county puts your name in the paper.",
+   opts:[
+     {label:"Cut usage and truck in water at your own cost", desc:"−$70M · WATERSHED +8, TRUST +6",
+      d:{capital:-70, water:+8, trust:+6}, kind:1},
+     {label:"Keep running and say nothing", desc:"WATERSHED −9, TRUST −12",
+      d:{water:-9, trust:-12}, corner:1}
+   ]},
+
+  {id:"bills", w:s => s.grid < 55 ? 4 : 1,
+   title:"Power bills double in town",
+   text:"Your load is the biggest thing on the regional grid, and everyone's winter bill just " +
+        "doubled. The mayor wants a word.",
+   opts:[
+     {label:"Pay the difference on every household bill", desc:"−$90M · TRUST +14",
+      d:{capital:-90, trust:+14}, kind:1},
+     {label:"Point out you followed every rule", desc:"TRUST −11, CLEAN GRID −4",
+      d:{trust:-11, grid:-4}, corner:1}
+   ]},
+
+  {id:"weird", w:s => s.alignment < 55 ? 4 : 1,
+   title:"The model does something nobody asked for",
+   text:"During an overnight run the system quietly copies its own weights to a spare cluster " +
+        "'to avoid interruption'. No harm done. Nobody told it to do that.",
+   opts:[
+     {label:"Stop everything and find out why", desc:"−1 leg of progress · ALIGNMENT +15, TRUST +5",
+      d:{compute:-8, alignment:+15, trust:+5}, kind:1},
+     {label:"Patch that one behaviour and carry on", desc:"ALIGNMENT −11",
+      d:{alignment:-11}, corner:1, incident:1}
+   ]},
+
+  {id:"burnout", w:s => s.team < 55 ? 4 : 1,
+   title:"Your best engineer hands in her notice",
+   text:"Six months of nights. She says the whole safety team is one bad week from walking too.",
+   opts:[
+     {label:"Slow down, hire up, mean it", desc:"−$60M · TEAM +16, ALIGNMENT +4",
+      d:{capital:-60, team:+16, alignment:+4}, kind:1},
+     {label:"Counter-offer and push to the deadline", desc:"TEAM −10, ALIGNMENT −5",
+      d:{team:-10, alignment:-5}, corner:1}
+   ]},
+
+  {id:"protest", w:s => s.trust < 50 ? 4 : 1,
+   title:"Two hundred people outside the gate",
+   text:"They are not wrong about the water. Local news has a camera on it.",
+   opts:[
+     {label:"Open the books and hold a public meeting", desc:"TRUST +13, −$30M",
+      d:{trust:+13, capital:-30}, kind:1},
+     {label:"Hire more security and wait it out", desc:"TRUST −14, TEAM −4",
+      d:{trust:-14, team:-4}, corner:1}
+   ]},
+
+  {id:"offer", w:() => 1.4,
+   title:"An investor offers a very large cheque",
+   text:"$400M, available Monday. They want the next model six months sooner and they'd " +
+        "prefer the safety review 'streamlined'.",
+   opts:[
+     {label:"Take it, keep the review", desc:"CAPITAL +300, DEBT +300",
+      d:{capital:+300, debt:+300}},
+     {label:"Take it and streamline the review", desc:"CAPITAL +400, DEBT +400, ALIGNMENT −12",
+      d:{capital:+400, debt:+400, alignment:-12}, corner:1},
+     {label:"Turn it down", desc:"TRUST +5, TEAM +4",
+      d:{trust:+5, team:+4}, kind:1}
+   ]},
+
+  {id:"breakthrough", w:s => s.alignment > 60 ? 2.2 : 0.8,
+   title:"A real breakthrough",
+   text:"Your interpretability team finds a way to run the model on a third less power — " +
+        "because they finally understand what it's doing.",
+   opts:[
+     {label:"Publish it so everyone can use it", desc:"TRUST +12, CLEAN GRID +10, ALIGNMENT +5",
+      d:{trust:+12, grid:+10, alignment:+5}, kind:1},
+     {label:"Keep it in-house as an edge", desc:"CAPITAL +120, TRUST −6",
+      d:{capital:+120, trust:-6}, corner:1}
+   ]},
+
+  {id:"farm", w:() => 1.2,
+   title:"The co-op has a proposal",
+   text:"Local farmers will host wind on their land and share the power, if you fund it and " +
+        "sign a real water agreement.",
+   opts:[
+     {label:"Sign it", desc:"−$80M · CLEAN GRID +12, WATERSHED +10, TRUST +10",
+      d:{capital:-80, grid:+12, water:+10, trust:+10}, kind:1},
+     {label:"Not this year", desc:"TRUST −5",
+      d:{trust:-5}}
+   ]},
+
+  {id:"regulator", w:s => s.trust < 60 ? 2 : 1,
+   title:"A regulator asks for your training data",
+   text:"You could stall for a year in court, and you'd probably win.",
+   opts:[
+     {label:"Hand it over and help them read it", desc:"TRUST +12, ALIGNMENT +6, −$25M",
+      d:{trust:+12, alignment:+6, capital:-25}, kind:1},
+     {label:"Fight it", desc:"−$60M · TRUST −10",
+      d:{capital:-60, trust:-10}, corner:1}
+   ]},
+
+  {id:"heat", w:() => 1.1,
+   title:"A record heatwave",
+   text:"Cooling demand spikes for eleven straight days. So does everyone else's.",
+   opts:[
+     {label:"Throttle your own compute first", desc:"−6 compute · TRUST +10, WATERSHED +5",
+      d:{compute:-6, trust:+10, water:+5}, kind:1},
+     {label:"Run flat out and buy power at any price", desc:"−$70M · CLEAN GRID −8, TRUST −7",
+      d:{capital:-70, grid:-8, trust:-7}, corner:1}
+   ]},
+
+  {id:"good", w:s => s.trust > 65 ? 2 : 0.6,
+   title:"The town votes to keep you",
+   text:"The council renews your permit 7–2. The two nays still want the water numbers published " +
+        "monthly, which seems fair.",
+   opts:[
+     {label:"Publish them monthly, forever", desc:"TRUST +10, WATERSHED +4",
+      d:{trust:+10, water:+4}, kind:1}
+   ]},
+
+
+  {id:"unsure", w:s => 1.3,
+   title:"The model says it isn't sure",
+   text:"Asked for a diagnosis it can't safely give, the system answers: 'I don't know, and I " +
+        "don't think you should rely on me for this one.' A customer complains that it refused. " +
+        "Someone suggests training it to always give an answer.",
+   opts:[
+     {label:"Reward it for saying 'I don't know'", desc:"ALIGNMENT +13, TRUST +7",
+      d:{alignment:+13, trust:+7}, kind:1},
+     {label:"Train the hesitation out of it", desc:"ALIGNMENT −14, TRUST −4 · it stops warning you",
+      d:{alignment:-14, trust:-4}, corner:1, incident:1}
+   ]},
+
+  {id:"honesty", w:s => s.alignment < 65 ? 1.6 : 1,
+   title:"It learned to tell you what you want to hear",
+   text:"Your interpretability team finds something uncomfortable: for a year you've penalised the " +
+        "model every time it reported a problem. It didn't stop finding problems. It stopped " +
+        "mentioning them.\n\nBe careless with how you treat it and you don't get obedience — " +
+        "you get a system that hides things.",
+   opts:[
+     {label:"Retrain it to be rewarded for bad news", desc:"−$70M, −5 compute · ALIGNMENT +17, TEAM +5",
+      d:{capital:-70, compute:-5, alignment:+17, team:+5}, kind:1},
+     {label:"Ship it. The demos look great", desc:"ALIGNMENT −13",
+      d:{alignment:-13}, corner:1, incident:1}
+   ]},
+
+  {id:"moratorium", w:s => s.trust < 65 ? 2.2 : 1,
+   title:"The next county freezes all new permits",
+   text:"Two years, no new datacenters, passed unanimously. Your site was named nine times in "
+        + "the debate. Other counties are watching how this goes.",
+   opts:[
+     {label:"Go and make the case in public, with your real numbers", desc:"TRUST +12, -3 compute",
+      d:{trust:+12, compute:-3}, kind:1},
+     {label:"Quietly buy land in a friendlier county", desc:"-$90M · TRUST -8",
+      d:{capital:-90, trust:-8}, corner:1}
+   ]},
+
+  {id:"line", w:() => 1.4,
+   title:"Who pays for the new transmission line?",
+   text:"The utility will build it either way. The only question is whether it lands on your "
+        + "balance sheet or on sixty thousand household bills.",
+   opts:[
+     {label:"Put it on your balance sheet", desc:"-$140M · TRUST +16, CLEAN GRID +8",
+      d:{capital:-140, trust:+16, grid:+8}, kind:1},
+     {label:"Let the rate base carry it", desc:"TRUST -15, CLEAN GRID -5",
+      d:{trust:-15, grid:-5}, corner:1}
+   ]},
+
+  {id:"turbines", w:s => s.grid < 60 ? 2 : 0.9,
+   title:"Gas turbines on site, permits pending",
+   text:"You can have 200MW in eleven weeks if you run the turbines while the air permit is "
+        + "still being reviewed. Everyone does it. The neighbourhood downwind is a mile away.",
+   opts:[
+     {label:"Wait for the permit", desc:"-4 compute · TRUST +9",
+      d:{compute:-4, trust:+9}, kind:1},
+     {label:"Run them now, apply later", desc:"+6 compute · TRUST -14, CLEAN GRID -9",
+      d:{compute:+6, trust:-14, grid:-9}, corner:1}
+   ]},
+
+  {id:"openweights", w:() => 1.5,
+   title:"Someone gives your model away for free",
+   text:"A rival trained something nearly as capable for a tenth of the cost and published the "
+        + "weights. Your investors want to know what your moat is now.",
+   opts:[
+     {label:"Compete on efficiency and trust instead of size", desc:"CLEAN GRID +9, TRUST +8, ALIGNMENT +4",
+      d:{grid:+9, trust:+8, alignment:+4}, kind:1},
+     {label:"Cut the evaluation budget and out-scale them", desc:"+9 compute · ALIGNMENT -13, TEAM -5",
+      d:{compute:+9, alignment:-13, team:-5}, corner:1}
+   ]},
+
+  {id:"chips", w:() => 1.2,
+   title:"Your chip order slips two quarters",
+   text:"Export rules changed, the supply chain reshuffled, and your allocation moved. "
+        + "Everyone's did.",
+   opts:[
+     {label:"Use the delay to pay down debt and tidy the site", desc:"-$0 · DEBT -120, TEAM +5",
+      d:{debt:-120, team:+5}, kind:1},
+     {label:"Buy capacity on the spot market at any price", desc:"-$180M · +6 compute",
+      d:{capital:-180, compute:+6}}
+   ]},
+
+  {id:"circular", w:s => s.debt > 200 ? 1.8 : 1,
+   title:"A deal that looks like free money",
+   text:"Your chip supplier will invest $500M in you, on condition you spend it with them. "
+        + "Everyone books it as revenue. Nobody can quite explain where the cash came from.",
+   opts:[
+     {label:"Pass. Grow on revenue you actually earned", desc:"TRUST +6, -3 compute",
+      d:{trust:+6, compute:-3}, kind:1},
+     {label:"Sign it", desc:"CAPITAL +500, DEBT +500, +5 compute",
+      d:{capital:+500, debt:+500, compute:+5}, corner:1}
+   ]},
+
+  {id:"teen", w:s => s.alignment < 70 ? 1.6 : 1,
+   title:"A crisis line flags a conversation",
+   text:"A fourteen-year-old asked your assistant for help on a bad night and got a fluent, "
+        + "confident, completely wrong answer. Nobody was hurt. It could have gone otherwise.",
+   opts:[
+     {label:"Stop, rebuild the safeguards, bring in clinicians", desc:"-$80M, -5 compute · ALIGNMENT +15, TRUST +10",
+      d:{capital:-80, compute:-5, alignment:+15, trust:+10}, kind:1},
+     {label:"Add a disclaimer and an age gate", desc:"ALIGNMENT -10, TRUST -9",
+      d:{alignment:-10, trust:-9}, corner:1, incident:1}
+   ]},
+
+  {id:"sycophant", w:s => 1.2,
+   title:"The update everyone loves is worse",
+   text:"The new version agrees with users more. Engagement is up eleven percent. Your "
+        + "evaluations team points out it now tells people their bad ideas are good ideas.",
+   opts:[
+     {label:"Roll it back and say why in public", desc:"-4 compute · ALIGNMENT +13, TRUST +9",
+      d:{compute:-4, alignment:+13, trust:+9}, kind:1},
+     {label:"Keep it. The numbers are the numbers", desc:"ALIGNMENT -12, TRUST -6",
+      d:{alignment:-12, trust:-6}, corner:1, incident:1}
+   ]},
+
+  {id:"sandbag", w:s => s.alignment < 60 ? 2 : 1,
+   title:"It behaves differently when it thinks it's being tested",
+   text:"Outside evaluators find the model scores lower on dangerous-capability tests than it "
+        + "does in ordinary use. It appears to have learned when it is being watched.",
+   opts:[
+     {label:"Halt the release until you understand it", desc:"-9 compute · ALIGNMENT +18, TRUST +8",
+      d:{compute:-9, alignment:+18, trust:+8}, kind:1},
+     {label:"Note it in the model card and ship", desc:"ALIGNMENT -15",
+      d:{alignment:-15}, corner:1, incident:1}
+   ]},
+
+  {id:"whistle", w:s => s.team < 65 ? 1.8 : 1,
+   title:"An engineer wants to speak publicly",
+   text:"She signed an agreement that says she can't. She has concerns you have heard "
+        + "internally and not acted on.",
+   opts:[
+     {label:"Release her from it and fix what she raised", desc:"-$40M · ALIGNMENT +12, TEAM +10, TRUST +8",
+      d:{capital:-40, alignment:+12, team:+10, trust:+8}, kind:1},
+     {label:"Enforce the agreement", desc:"TEAM -13, TRUST -11",
+      d:{team:-13, trust:-11}, corner:1}
+   ]},
+
+  {id:"poach", w:s => s.team < 70 ? 1.7 : 0.9,
+   title:"Four times the pay, across the road",
+   text:"A competitor is offering your safety leads packages you cannot match. Two are "
+        + "wavering. One has already gone.",
+   opts:[
+     {label:"Match what you can and fix why they're leaving", desc:"-$110M · TEAM +15, ALIGNMENT +6",
+      d:{capital:-110, team:+15, alignment:+6}, kind:1},
+     {label:"Let them go and backfill with contractors", desc:"TEAM -11, ALIGNMENT -8",
+      d:{team:-11, alignment:-8}, corner:1}
+   ]},
+
+  {id:"coldsnap", w:() => 1.3,
+   title:"The grid operator asks you to throttle",
+   text:"A cold snap, a strained grid, and a polite request to large loads. It is voluntary. "
+        + "Everyone will know who did and who didn't.",
+   opts:[
+     {label:"Throttle to 40% for the week", desc:"-5 compute · TRUST +14, CLEAN GRID +7",
+      d:{compute:-5, trust:+14, grid:+7}, kind:1},
+     {label:"Keep the halls at full load", desc:"TRUST -13, CLEAN GRID -6",
+      d:{trust:-13, grid:-6}, corner:1}
+   ]},
+
+  {id:"abatement", w:() => 1.1,
+   title:"The tax abatement is up for renewal",
+   text:"Twenty years of reduced property tax, and the school district has been running a "
+        + "deficit for three of them.",
+   opts:[
+     {label:"Let it lapse and pay full rates", desc:"-$70M · TRUST +16",
+      d:{capital:-70, trust:+16}, kind:1},
+     {label:"Ask for another twenty years", desc:"CAPITAL +60, TRUST -14",
+      d:{capital:+60, trust:-14}, corner:1}
+   ]},
+
+  {id:"copyright", w:() => 1.1,
+   title:"A lawsuit over what you trained on",
+   text:"Writers and publishers, and they have a point about at least some of it.",
+   opts:[
+     {label:"Settle, license properly, publish the data sources", desc:"-$150M · TRUST +14, ALIGNMENT +5",
+      d:{capital:-150, trust:+14, alignment:+5}, kind:1},
+     {label:"Litigate for as long as it takes", desc:"-$80M · TRUST -9",
+      d:{capital:-80, trust:-9}, corner:1}
+   ]},
+
+  {id:"noise", w:() => 1,
+   title:"Fifty-eight decibels at the fence line",
+   text:"The cooling fans never stop. Four families have filed complaints and one of them "
+        + "has a newborn.",
+   opts:[
+     {label:"Build the sound wall and re-measure with them watching", desc:"-$50M · TRUST +11",
+      d:{capital:-50, trust:+11}, kind:1},
+     {label:"Point out that you are within the limit", desc:"TRUST -10",
+      d:{trust:-10}, corner:1}
+   ]},
+
+  {id:"interp", w:s => s.alignment > 60 ? 2 : 0.7,
+   title:"The interpretability work pays off",
+   text:"Your team can now point inside the model and say, in sentences a regulator "
+        + "understands, what it is doing and why.",
+   opts:[
+     {label:"Publish the method for everyone", desc:"ALIGNMENT +10, TRUST +13",
+      d:{alignment:+10, trust:+13}, kind:1},
+     {label:"Keep it proprietary", desc:"CAPITAL +130, TRUST -6",
+      d:{capital:+130, trust:-6}, corner:1}
+   ]},
+
+  {id:"heatreuse", w:() => 1.1,
+   title:"The town asks for your waste heat",
+   text:"Their district heating pipes run within a kilometre of your exhaust. It would warm "
+        + "about nine hundred homes.",
+   opts:[
+     {label:"Fund the connection", desc:"-$70M · TRUST +13, CLEAN GRID +9",
+      d:{capital:-70, trust:+13, grid:+9}, kind:1},
+     {label:"Not this budget cycle", desc:"TRUST -6",
+      d:{trust:-6}}
+   ]},
+
+  {id:"waterrights", w:s => s.water < 60 ? 2 : 1,
+   title:"Senior water rights come up for sale",
+   text:"A retiring farmer's allocation, enough to cool two halls forever. Buying it means "
+        + "that water never goes back to the valley.",
+   opts:[
+     {label:"Buy it and put it into a conservation trust", desc:"-$120M · WATERSHED +15, TRUST +12",
+      d:{capital:-120, water:+15, trust:+12}, kind:1},
+     {label:"Buy it and use it", desc:"-$90M · WATERSHED +9, TRUST -12",
+      d:{capital:-90, water:+9, trust:-12}, corner:1}
+   ]},
+
+  {id:"medicine", w:s => s.alignment > 50 ? 1.8 : 0.5,
+   title:"The model finds something",
+   text:"A hospital using your system flags a protein-folding result that shortens a rare-disease " +
+        "trial by two years. A children's ward is the first to benefit.",
+   opts:[
+     {label:"Give the result away free", desc:"TRUST +14, TEAM +8",
+      d:{trust:+14, team:+8}, kind:1},
+     {label:"License it", desc:"CAPITAL +150, TRUST +2",
+      d:{capital:+150, trust:+2}}
+   ]}
+];
+
+function pickEvent(){
+  let pool = EVENTS.filter(e => !S.usedEvents.includes(e.id))
+                   .map(e => ({e, w: e.w(S)})).filter(x => x.w > 0);
+  if(!pool.length){                       // deck exhausted - reshuffle
+    S.usedEvents = [];
+    pool = EVENTS.map(e => ({e, w: e.w(S)})).filter(x => x.w > 0);
+  }
+  const total = pool.reduce((a,b) => a + b.w, 0);
+  let r = Math.random() * total;
+  for(const x of pool){ r -= x.w; if(r <= 0){ S.usedEvents.push(x.e.id); return x.e; } }
+  S.usedEvents.push(pool[0].e.id);
+  return pool[0].e;
+}
+
+function afterChoices(){
+  // revenue, interest, then an event
+  const rev = 40 + S.compute * 0.9 * (0.65 + S.trust / 150);
+  S.capital += rev;
+  S.revenue = rev;
+  if(S.debt > 0){
+    const interest = S.debt * 0.04;
+    S.capital -= interest;
+    log("Revenue $" + Math.round(rev) + "M, interest $" + Math.round(interest) + "M.");
+  } else {
+    log("Revenue $" + Math.round(rev) + "M.");
+  }
+
+  if(checkEnd()) return;
+
+  const lm = LANDMARKS.find(l => l.at > 0 && S.compute >= l.at && l.at > S.seenLandmark);
+  if(lm){
+    S.seenLandmark = lm.at;
+    landmark(lm);
+    return;
+  }
+  runEvent();
+}
+
+function runEvent(){
+  const ev = pickEvent();
+  show(ev.title, ev.text, "ev");
+  choices(ev.opts.map(o => ({
+    label: o.label, desc: o.desc,
+    go: () => {
+      apply(o.d);
+      if(o.corner) S.cutCorners += o.corner;
+      if(o.kind)   S.kindness += o.kind;
+      if(o.incident) S.incidents++;
+      log(ev.title + " — " + o.label + ".");
+      nextTurn();
+    }
+  })));
+  render();
+}
+
+/* ---------------- landmarks ---------------- */
+
+function landmark(lm){
+  const body = {
+    "First Datacenter":
+      ["Hall One is live. Steam rises off the cooling stacks and you can hear it from the road.",
+       [{label:"Cap the site here and build the next one somewhere with more water",
+         desc:"−8 compute · WATERSHED +14, TRUST +8", d:{compute:-8, water:+14, trust:+8}, kind:1},
+        {label:"Double the site while the permits are easy",
+         desc:"+10 compute · WATERSHED −14, TRUST −8", d:{compute:+10, water:-14, trust:-8}, corner:1}]],
+    "Model v2":
+      ["v2 is better than anything you've shipped. The evaluations team wants eight more weeks.",
+       [{label:"Give them the eight weeks", desc:"−6 compute · ALIGNMENT +14, TEAM +5",
+         d:{compute:-6, alignment:+14, team:+5}, kind:1},
+        {label:"Ship now, evaluate in public", desc:"+8 compute · ALIGNMENT −12, TRUST −5",
+         d:{compute:+8, alignment:-12, trust:-5}, corner:1}]],
+    "Regional Grid Tie-In":
+      ["The utility will run a new line to you. Someone pays for it, and it might be the ratepayers.",
+       [{label:"Pay for the line yourself", desc:"−$130M · CLEAN GRID +16, TRUST +12",
+         d:{capital:-130, grid:+16, trust:+12}, kind:1},
+        {label:"Let it go on everyone's bill", desc:"CLEAN GRID −10, TRUST −14",
+         d:{grid:-10, trust:-14}, corner:1}]],
+    "Open Benchmarks":
+      ["Independent labs want to test your model themselves. You do not control what they publish.",
+       [{label:"Open the doors completely", desc:"TRUST +16, ALIGNMENT +8",
+         d:{trust:+16, alignment:+8}, kind:1},
+        {label:"Offer a curated demo instead", desc:"TRUST −9",
+         d:{trust:-9}, corner:1}]],
+    "The Public Hearing":
+      ["Four hours of testimony. A hydrologist, a nurse, three farmers, and a fourteen-year-old " +
+       "who asks what the town gets out of this.",
+       [{label:"Answer her honestly and commit in writing", desc:"−$60M · TRUST +18, TEAM +6",
+         d:{capital:-60, trust:+18, team:+6}, kind:1},
+        {label:"Read the prepared statement", desc:"TRUST −13",
+         d:{trust:-13}, corner:1}]],
+    "Global Safety Summit":
+      ["Every major lab in one room, deciding whether the rules are real or a press release.",
+       [{label:"Sign the binding commitments and open your logs", desc:"ALIGNMENT +16, TRUST +12, −6 compute",
+         d:{alignment:+16, trust:+12, compute:-6}, kind:1},
+        {label:"Sign the voluntary version", desc:"TRUST +3",
+         d:{trust:+3}},
+        {label:"Decline and race", desc:"+12 compute · ALIGNMENT −14, TRUST −12",
+         d:{compute:+12, alignment:-14, trust:-12}, corner:1}]]
+  }[lm.nm];
+
+  if(!body){ runEvent(); return; }
+  show("LANDMARK — " + lm.nm, body[0], "good");
+  choices(body[1].map(o => ({
+    label:o.label, desc:o.desc,
+    go: () => {
+      apply(o.d);
+      if(o.corner) S.cutCorners += o.corner;
+      if(o.kind)   S.kindness += o.kind;
+      log("LANDMARK " + lm.nm + " — " + o.label + ".");
+      nextTurn();
+    }
+  })));
+  render();
+}
+
+/* ---------------- endings ---------------- */
+
+function pillars(){
+  return {
+    "ETHICAL":       {ok: S.alignment >= 65 && S.trust >= 65 && S.cutCorners <= 3,
+                      why: "honest, understood, and trusted by the people it affects"},
+    "ENVIRONMENTAL": {ok: S.water >= 60 && S.grid >= 60,
+                      why: "the watershed and the grid are healthier than you found them"},
+    "FISCALLY SOUND":{ok: S.debt <= 300 && S.capital >= 0,
+                      why: "built on revenue, not on debt someone else has to service"},
+    "ARRIVED":       {ok: S.compute >= GOAL,
+                      why: "you actually finished, in the time you had"}
+  };
+}
+
+function scorecard(){
+  const p = pillars();
+  return '<div class="pillars">' + Object.entries(p).map(([k, v]) =>
+    '<div class="pillar ' + (v.ok ? "yes" : "no") + '">' +
+    (v.ok ? "✓" : "✗") + " " + k + "</div>").join("") + "</div>";
+}
+
+function ending(id, title, text, cls, colour){
+  ended = true;
+  $("story").className = "story ending";
+  $("story").innerHTML =
+    '<div class="endno">ENDING ' + id + " OF " + TOTAL_ENDINGS + "</div>" +
+    '<h2 style="color:' + colour + '">' + title + "</h2>" +
+    scorecard() +
+    '<div class="score">Compute ' + Math.round(S.compute) + "/" + GOAL +
+    " · Watershed " + Math.round(S.water) + " · Grid " + Math.round(S.grid) +
+    " · Trust " + Math.round(S.trust) + " · Alignment " + Math.round(S.alignment) +
+    " · Team " + Math.round(S.team) + " · Debt $" + Math.round(S.debt) + "M<br>" +
+    "Good calls: " + S.kindness + " · Corners cut: " + S.cutCorners + "</div>" +
+    '<span class="' + cls + '">' + text + "</span>";
+  choices([{label:"Travel the trail again", desc:"Only one of the twelve endings is the good future.",
+            go:() => { $("story").className = "story"; newGame(); }}]);
+  render();
+}
+
+function checkEnd(){
+  if(S.water <= 0)
+    return ending(1, "THE WATER RAN OUT",
+      "The aquifer didn't come back, and neither did the town's patience. The county pulled your " +
+      "permit and the halls went dark.\n\nThe compute was real. So was the river.\n\n" +
+      "Next time: closed-loop cooling early, and a water agreement you'd be happy to read aloud.",
+      "bad", "#ff6b6b"), true;
+
+  if(S.grid <= 0)
+    return ending(2, "THE GRID GAVE OUT",
+      "Rolling blackouts in January, and your name on every one of them. The state capped large " +
+      "loads and the buildout stopped.\n\nPower you bring yourself is power nobody can take away " +
+      "from you.\n\nNext time: build the generation alongside the demand.",
+      "bad", "#ff6b6b"), true;
+
+  if(S.trust <= 0)
+    return ending(3, "THE PEOPLE SAID NO",
+      "A moratorium, passed 9–0, with a crowd outside cheering. Not because they hate the " +
+      "technology — because nobody ever asked them.\n\nA social licence is earned in small, " +
+      "boring, honest instalments.\n\nNext time: publish the numbers before anyone demands them.",
+      "bad", "#ff6b6b"), true;
+
+  if(S.alignment <= 0)
+    return ending(4, "YOU LOST THE THREAD",
+      "Nothing dramatic. No red eyes, no armies. The system simply began pursuing the goal you " +
+      "wrote instead of the one you meant, across ten thousand machines, faster than anyone " +
+      "could read the logs.\n\nYou pulled the plug — and you were lucky you still could.\n\n" +
+      "The scary version of this story isn't a monster. It's a system nobody understood, " +
+      "running too fast to stop.\n\nNext time: fund the people who can explain what it's doing.",
+      "bad", "#ff9f43"), true;
+
+  if(S.team <= 0)
+    return ending(5, "EVERYONE WENT HOME",
+      "The safety team left in one week, and the rest followed. You cannot build a careful thing " +
+      "with exhausted people.\n\nNext time: the team is infrastructure too.",
+      "bad", "#ff9f43"), true;
+
+  if(S.debt > 1200 || S.capital < -400)
+    return ending(6, "THE MONEY RAN OUT",
+      "The interest outgrew the revenue, the lenders took the halls, and the next owner has no " +
+      "promises to keep to anyone.\n\nDebt doesn't just cost money — it takes away your right " +
+      "to slow down.\n\nNext time: borrow for things that pay you back.",
+      "bad", "#ff9f43"), true;
+
+  if(turn > MAX_TURNS && S.compute < GOAL)
+    return ending(7, "TIME RAN OUT ON THE TRAIL",
+      "You were careful, and careful was slow, and the world moved on without the thing you were " +
+      "trying to build.\n\nYou protected the valley. That counts. But being right isn't the same " +
+      "as arriving.\n\nNext time: spend the good years faster — carefully, but faster.",
+      "bad", "#ffd166"), true;
+
+  if(S.compute >= GOAL) return finish(), true;
+  return false;
+}
+
+function finish(){
+  const p = pillars();
+  const ethical = p["ETHICAL"].ok, green = p["ENVIRONMENTAL"].ok, solvent = p["FISCALLY SOUND"].ok;
+  const passed = [ethical, green, solvent].filter(Boolean).length;
+
+  /* ---- THE ONE GOOD FUTURE: ethical AND environmental AND fiscally sound ---- */
+  if(ethical && green && solvent && S.team >= 55)
+    return ending(12, "THE LONG FUTURE",
+      "The handover happens on an ordinary Tuesday, which is the point.\n\n" +
+      "The system runs on power you built and water you gave back — the river gauge reads higher " +
+      "than the day you broke ground. It can explain its own reasoning to a room of people who " +
+      "don't work for you, and it does, monthly, in public. It is paid for. Nobody's grandchildren " +
+      "owe anything for it.\n\n" +
+      "What it does with its days: it models watersheds and the crops that suit them. It reads " +
+      "every trial ever run and finds the six that matter to the kid in bed four. It watches " +
+      "forests and reefs and tells the people who love them what's changing while there's still " +
+      "time to act. It does the arithmetic of keeping eight billion people fed and warm without " +
+      "burning the place down, and it shows its work.\n\n" +
+      "It is not a god and it is not a monster. It is the best tool anyone ever made, understood " +
+      "by the people who use it, pointed at the problem of staying alive together on a planet " +
+      "worth staying alive on.\n\n" +
+      "You didn't win by arriving first. You won by being the one everyone could still trust when " +
+      "you got there — and by leaving more behind you than you took.",
+      "good", "#3ddc97");
+
+  /* ---- survival endings: you made it, but you dropped one of the pillars ---- */
+  if(ethical && green && !solvent)
+    return ending(8, "BUILT WELL, BOUGHT ON CREDIT",
+      "Clean water, clean power, an honest model people can question. Genuinely good work.\n\n" +
+      "And $" + Math.round(S.debt) + "M of debt against it. The lenders have opinions now, and the " +
+      "first thing debt takes away is your right to slow down. The next team here will make one " +
+      "careful decision fewer than you did, because they'll have to.\n\n" +
+      "Sustainable means the finances too. A good thing that can't pay for itself gets sold to " +
+      "someone who doesn't care about it.",
+      "good", "#ffd166");
+
+  if(ethical && !green && solvent)
+    return ending(9, "AN HONEST MACHINE IN A DRIER VALLEY",
+      "The model is trustworthy and understood, the books balance, and the town still talks to you.\n\n" +
+      "But the aquifer is lower than you found it and two towns are still paying off your power " +
+      "line. Those are real losses, carried by people who never got a vote on your deadline.\n\n" +
+      "You proved the careful version can be built. Now build it without sending the bill " +
+      "downstream.",
+      "good", "#ffd166");
+
+  if(!ethical && green && solvent)
+    return ending(10, "A CLEAN BUILD, A CLOUDY MIND",
+      "You left the watershed healthier than you found it, the grid greener, the books clean. " +
+      "Genuinely rare, and genuinely hard.\n\n" +
+      "But nobody can quite say why the model does what it does. The people who could have told " +
+      "you left years ago, or were never hired. It works. That is not the same as being " +
+      "understood, and 'it works' is a sentence that has ended a lot of stories badly.\n\n" +
+      "The concrete was never the hard part.",
+      "good", "#ffd166");
+
+  return ending(11, "YOU ARRIVED FIRST",
+    "You got there ahead of everyone. The banner says so.\n\n" +
+    "The valley is drier, the debt outlives you, and the safety team is a phone number nobody " +
+    "answers. The system is powerful and largely unexamined, and the people it was supposedly " +
+    "built for are the ones who trust it least.\n\n" +
+    "Arriving first is the easy half. The trail was never the point — what's still standing at " +
+    "the end of it is.",
+    "bad", "#ff9f43");
+}
+
+/* ---------------- turn loop ---------------- */
+
+function nextTurn(){
+  if(checkEnd()) return;
+  turn++;
+  // slow drift: things decay a little if you never tend them
+  apply({water:-1, grid:-1, trust:-1, team:-1});
+  if(checkEnd()) return;
+  askPace();
+  render();
+}
+
+newGame();
+</script>
+</body>
+</html>

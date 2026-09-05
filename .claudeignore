@@ -1,0 +1,11 @@
+# Secrets / credentials
+.env
+.env.*
+*.key
+*.pem
+secrets/
+credentials.json
+
+# Local junk
+node_modules/
+.DS_Store
