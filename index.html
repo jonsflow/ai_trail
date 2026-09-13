@@ -8,8 +8,10 @@
 <style>
   body{font-family:"Courier New", ui-monospace, monospace}
   .wrap{width:min(96vw, 880px)}
-  .lede{color:#93a0cc;text-align:center;max-width:60ch;margin:0 auto 22px;
-        line-height:1.7;font-size:15px}
+  .lede{max-width:62ch;margin:4px auto 24px}
+  .lede p{color:#d7ffe9;font-size:15px;line-height:1.8;margin:0 0 12px;max-width:none}
+  .lede p:first-child{color:#ffd166;font-size:16px}
+  .lede p:last-child{margin-bottom:0}
   .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
          gap:14px;margin-bottom:26px;max-width:520px;margin-left:auto;margin-right:auto}
   .door{
@@ -77,11 +79,24 @@
 <div class="wrap">
 
 <h1>The AI Buildout Trail</h1>
-<p class="lede">
-  A thought experiment in two forms: a sourced account of what the AI buildout has
-  actually cost so far, and a game built on the same material. The document is the
-  authority. The game is a way of feeling the tradeoffs it describes.
-</p>
+<div class="lede">
+  <p>
+    This is a game. You are running an AI buildout, from 2026 to 2037 &mdash; twenty rounds
+    to build enough compute to matter.
+  </p>
+  <p>
+    You choose how hard to push, where the money goes, and what to do when a drought, a
+    protest or a regulator shows up. Every round costs something: the river you cool with,
+    the grid you draw from, the town that has to agree to you being there, the model you are
+    supposed to understand, or the people building it for you.
+  </p>
+  <p>
+    Getting there is not winning. You are scored on four things at once &mdash; whether it was
+    built honestly, whether the valley is better or worse for your having been in it, whether
+    it paid for itself, and whether you finished at all. Get all four and you reach the future
+    worth having. Most runs do not.
+  </p>
+</div>
 
 <div class="doors">
   <a class="door primary" href="aitrail.html">
@@ -89,17 +104,6 @@
     <span>Twenty rounds, 2026&ndash;2037. Build the compute, keep the town, stay solvent. Twelve endings.</span>
   </a>
 </div>
-
-<section>
-  <h2>What this is</h2>
-  <p>
-    Part I is a sourced history of the buildout &mdash; the water, the grid, the money,
-    the permits, the people &mdash; with risk and documented counterweight carrying equal
-    weight in every section. Part II projects five futures from it, one of which is the
-    good one. The game applies Oregon Trail's structure to the same problem and scores
-    you on the four pillars both halves share.
-  </p>
-</section>
 
 <section>
   <h2>How to play</h2>
@@ -206,6 +210,12 @@
     choose, supplies you ration, and events that arrive whether or not you were ready for
     them. What is different is the scoring. <em>The Oregon Trail</em> asked whether you
     arrived. This one asks what condition you left everything in when you did.
+  </p>
+  <p>
+    None of the decisions in it are invented. The droughts, the moratoria, the power deals,
+    the water disclosures and the safety reviews all come from things that have actually
+    happened since 2022, written up separately with every claim tagged documented, estimate
+    or contested. The game is the short version. The paper is the evidence.
   </p>
 </section>
 
