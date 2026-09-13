@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AI Buildout Trail</title>
+<link rel="stylesheet" href="arcade.css">
+<style>
+  body{font-family:"Courier New", ui-monospace, monospace}
+  .wrap{width:min(96vw, 880px)}
+  .lede{color:#93a0cc;text-align:center;max-width:60ch;margin:0 auto 22px;
+        line-height:1.7;font-size:15px}
+  .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+         gap:14px;margin-bottom:30px}
+  .door{
+    display:block;text-decoration:none;color:#d7ffe9;
+    background:#0d2318;border:2px solid #1f6b45;border-radius:12px;
+    padding:16px 18px;transition:background .15s, border-color .15s;
+  }
+  .door:hover{background:#123a26;border-color:#3ddc97}
+  .door b{display:block;color:#ffd166;font-size:17px;letter-spacing:1px;margin-bottom:6px}
+  .door span{font-size:13px;color:#7ee8b5;line-height:1.6;display:block}
+  .door.primary{background:#123a26;border-color:#2a8a58}
+  .door.primary:hover{background:#1a5236}
+  section{
+    background:#08160f;border:3px solid #1f6b45;border-radius:14px;
+    padding:20px 22px;margin-bottom:16px;
+    box-shadow:0 0 40px rgba(61,220,151,.10) inset, 0 10px 30px rgba(0,0,0,.45);
+  }
+  h2{
+    margin:0 0 14px;color:#ffd166;font-size:13px;letter-spacing:3px;
+    text-transform:uppercase;font-weight:700;
+  }
+  h3{margin:20px 0 8px;color:#7ee8b5;font-size:14px;letter-spacing:1px}
+  h3:first-of-type{margin-top:0}
+  p{color:#d7ffe9;font-size:14.5px;line-height:1.75;margin:0 0 12px;max-width:66ch}
+  .goal{font-size:16px;color:#d7ffe9;line-height:1.75;margin:0;max-width:66ch}
+  .goal b{color:#3ddc97}
+  ol.rounds{margin:0;padding:0;list-style:none;counter-reset:r;display:grid;gap:12px}
+  ol.rounds li{
+    counter-increment:r;position:relative;padding-left:44px;
+    color:#d7ffe9;font-size:14.5px;line-height:1.7;max-width:64ch;
+  }
+  ol.rounds li::before{
+    content:counter(r);position:absolute;left:0;top:0;
+    width:28px;height:28px;border-radius:7px;
+    background:#123a26;border:2px solid #2a8a58;color:#3ddc97;
+    font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  }
+  ol.rounds b{color:#ffd166;display:block;margin-bottom:2px}
+  .carry{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin:0 0 14px}
+  .carry div{
+    background:#0d2318;border:2px solid #1f6b45;border-radius:8px;padding:9px 11px;
+    font-size:12px;color:#7ee8b5;letter-spacing:.6px;line-height:1.5;
+  }
+  .carry div b{display:block;color:#ffd166;font-size:12.5px;letter-spacing:1px;margin-bottom:3px}
+  .tblwrap{overflow-x:auto;margin:0 0 14px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:420px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #1f6b45;vertical-align:top}
+  th{color:#5fae86;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+  td:first-child{color:#ffd166;font-weight:700;white-space:nowrap}
+  td:last-child{color:#d7ffe9;font-variant-numeric:tabular-nums}
+  ul.plain{margin:0;padding-left:20px;color:#d7ffe9;font-size:14.5px;line-height:1.75;max-width:64ch}
+  ul.plain li{margin-bottom:7px}
+  ul.plain b{color:#ffd166}
+  .note{
+    border-left:3px solid #7a5a1a;padding-left:14px;color:#e4d6ae;
+    font-size:14px;line-height:1.7;margin:0 0 12px;max-width:62ch;
+  }
+  .note:last-child{margin-bottom:0}
+  .note b{color:#ffd166}
+  footer{color:#5fae86;font-size:12px;text-align:center;margin-top:6px;line-height:1.8}
+  footer a{color:#7ee8b5}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>The AI Buildout Trail</h1>
+<p class="lede">
+  A thought experiment in two forms: a sourced account of what the AI buildout has
+  actually cost so far, and a game built on the same material. The document is the
+  authority. The game is a way of feeling the tradeoffs it describes.
+</p>
+
+<div class="doors">
+  <a class="door primary" href="aitrail.html">
+    <b>Play the trail &rarr;</b>
+    <span>Twenty rounds, 2026&ndash;2037. Build the compute, keep the town, stay solvent. Twelve endings.</span>
+  </a>
+  <a class="door" href="https://github.com/jonsflow/ai_trail/blob/main/NARRATIVE.md">
+    <b>Read the paper &rarr;</b>
+    <span>Part I: what happened, 2022&ndash;2026, every claim tagged documented, estimate or contested. Part II: five futures.</span>
+  </a>
+</div>
+
+<section>
+  <h2>What this is</h2>
+  <p>
+    Part I is a sourced history of the buildout &mdash; the water, the grid, the money,
+    the permits, the people &mdash; with risk and documented counterweight carrying equal
+    weight in every section. Part II projects five futures from it, one of which is the
+    good one. The game applies Oregon Trail's structure to the same problem and scores
+    you on the four pillars both halves share.
+  </p>
+</section>
+
+<section>
+  <h2>How to play</h2>
+
+  <h3>The goal</h3>
+  <p class="goal">
+    Build <b>200 units of compute in 20 rounds</b> &mdash; 2026 to 2037 &mdash; and still
+    be able to defend how you did it. Arriving is the easy half.
+  </p>
+
+  <h3>A round is three decisions</h3>
+  <ol class="rounds">
+    <li><b>How hard do you push?</b>
+      Careful (+10 compute, $35M, the town stays with you) &middot; Steady (+15, $60M, a
+      fair trade on every front) &middot; Breakneck (+23, $100M, burns water, power,
+      goodwill and people). Careful alone will not get you to 200 in 20 rounds. That is
+      the squeeze the whole game runs on.</li>
+    <li><b>Where does the money go?</b>
+      Three options a round, always including something for your weakest stat. Fix the
+      watershed, buy clean power, fund an outside red team, hire ahead of the crunch
+      &mdash; or take on debt, or spend nothing.</li>
+    <li><b>Something happens.</b>
+      A drought, a protest, a regulator, an offer you shouldn't take. Thirty-five events,
+      never repeating, weighted toward whatever you have been neglecting. At fixed
+      compute thresholds you hit a landmark instead &mdash; a bigger decision with a
+      longer shadow.</li>
+  </ol>
+
+  <h3>What you're carrying</h3>
+  <div class="carry">
+    <div><b>Watershed</b>the river you cool with</div>
+    <div><b>Clean grid</b>the power you draw</div>
+    <div><b>Public trust</b>whether the town agrees</div>
+    <div><b>Alignment</b>whether you understand it</div>
+    <div><b>Team</b>the people building it</div>
+  </div>
+  <p>
+    All five run 0&ndash;100, and any one of them hitting zero ends the run on the spot.
+    You also carry <b>capital</b>, <b>debt</b> and <b>compute</b> &mdash; compute is the
+    distance bar, and it earns revenue, more of it when trust is high.
+  </p>
+
+  <h3>What counts as winning</h3>
+  <div class="tblwrap">
+  <table>
+    <thead><tr><th>Pillar</th><th>Passes when</th></tr></thead>
+    <tbody>
+      <tr><td>Ethical</td><td>alignment &ge; 65, trust &ge; 65, corners cut &le; 3</td></tr>
+      <tr><td>Environmental</td><td>watershed &ge; 60 and clean grid &ge; 60</td></tr>
+      <tr><td>Fiscally sound</td><td>debt &le; $300M and capital not negative</td></tr>
+      <tr><td>Arrived</td><td>compute reached 200</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>
+    You need <b>all four at once</b>. There is no partial credit. Three of four is the
+    <em>normal</em> outcome &mdash; it gets you a survival ending that names the pillar
+    you dropped and what it cost. All four, plus a team still standing, is the only route
+    to <b>THE LONG FUTURE</b>, and it is one of twelve endings.
+  </p>
+
+  <h3>The ideal</h3>
+  <p>
+    Careful and steady pace. Money into the weakest thing rather than the most exciting
+    thing. Debt kept low enough that it never compounds against you. Play like that and
+    the good ending is reliable, not lucky &mdash; which is the argument the game exists
+    to make.
+  </p>
+
+  <h3>The less ideal</h3>
+  <ul class="plain">
+    <li><b>Race</b> and the town says no before you finish.</li>
+    <li><b>Borrow</b> your way there and the money runs out.</li>
+    <li><b>Only</b> protect safety, or only the environment, and time runs out at round 20.</li>
+    <li><b>Cut four corners</b> and ETHICAL fails even with alignment at 100 and trust at
+      99 &mdash; the scorecard will name all four decisions and the round you made each one.</li>
+    <li><b>Arrive first having dropped two pillars</b> and you get a banner and a failure,
+      which is the ending most players see the first time.</li>
+  </ul>
+
+  <h3>Watch for two things</h3>
+  <p class="note">
+    A <b>dividend</b> means a pillar got high enough to pay you back, and the screen names
+    which one.
+  </p>
+  <p class="note">
+    A <b>margin call</b> fires once at debt over $700M or capital under &minus;$250M, and it
+    rescues you by force-selling compute &mdash; it costs you the thing you are racing for.
+    Bankruptcy is &minus;$500M.
+  </p>
+</section>
+
+<footer>
+  No build step, no dependencies, no tracking. Open <code>aitrail.html</code> in a browser
+  and it runs.<br>
+  Source: <a href="https://github.com/jonsflow/ai_trail">github.com/jonsflow/ai_trail</a>
+</footer>
+
+</div>
+</body>
+</html>
