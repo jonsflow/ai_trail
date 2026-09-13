@@ -162,3 +162,19 @@ const missing = [];
 for(let i=1;i<=12;i++) if(!seen[String(i)]) missing.push(i);
 console.log("  endings never reached:", missing.length ? missing.join(",") : "none");
 console.log("  dead ends:", seen["NONE"] || 0);
+
+/* ---------- 3. the ending screen can actually restart ---------- */
+/* This harness replaces choices() with a collector, so it never runs the real
+   click handler - which is why it happily passed a build whose restart button
+   was dead. The handler is `if(!ended || c.always) c.go()`, and `ended` is true
+   on an ending screen by definition, so a restart option without `always` never
+   fires. Replay that guard here rather than trusting the option list. */
+console.log("\n=== restart ===");
+playOne("prudent");
+const endScreen = CURRENT;
+const restart = endScreen[0];
+const fires = !ended || !!restart.always;
+console.log("  ending offers:", endScreen.length, "option(s) —", JSON.stringify(restart.label));
+console.log("  click guard lets it fire:", fires ? "yes" : "NO - restart is dead");
+if(fires) restart.go();
+console.log("  new game started:", (!ended && turn === 1) ? "yes" : "NO");

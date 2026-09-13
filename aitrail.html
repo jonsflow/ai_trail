@@ -17,6 +17,11 @@
   }
   .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
        color:#7ee8b5;font-size:14px;letter-spacing:1px;margin-bottom:10px}
+  .traillabel{
+    display:flex;justify-content:space-between;align-items:baseline;
+    color:#5fae86;font-size:11px;letter-spacing:1.5px;margin-bottom:5px;
+  }
+  .traillabel span:last-child{color:#7ee8b5;font-weight:bold}
   .trail{
     position:relative;height:26px;background:#0d2318;border:2px solid #1f6b45;
     border-radius:6px;margin-bottom:14px;overflow:hidden;
@@ -69,7 +74,22 @@
   .ending h2{font-size:26px;margin:6px 0 10px;letter-spacing:1px}
   .endno{font-size:12px;letter-spacing:3px;color:#5fae86;margin-bottom:4px}
   .pillars{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0}
-  .pillar{font-size:12px;letter-spacing:1px;border-radius:20px;padding:5px 13px;border:2px solid}
+  .pillar{font-size:12px;letter-spacing:1px;border-radius:10px;padding:8px 13px;border:2px solid;
+    text-align:left}
+  .pname{font-weight:700;margin-bottom:4px}
+  .test{font-size:10.5px;letter-spacing:.4px;opacity:.85;line-height:1.5}
+  .test.tok{color:#7ee8b5}
+  .test.tno{color:#ff8f6b;font-weight:700;opacity:1}
+  .earned{font-size:11px;letter-spacing:1.5px;color:#3ddc97;margin-bottom:10px;
+    text-transform:uppercase}
+  .triggered{font-size:11px;letter-spacing:1.5px;color:#ff8f6b;margin-bottom:10px;
+    text-transform:uppercase}
+  .warnline{margin-top:12px;font-size:13px;color:#ffd166;border-left:3px solid #7a5a1a;
+    padding-left:12px;line-height:1.6}
+  .cornerlog{margin:18px auto 0;max-width:520px;text-align:left;font-size:12px;
+    border:1px solid #7a3a2a;border-radius:8px;padding:10px 14px;background:rgba(255,107,107,.07)}
+  .cornerlog b{display:block;color:#ff8f6b;letter-spacing:1px;font-size:11px;margin-bottom:6px}
+  .cornerlog div{color:#c9bfae;line-height:1.6}
   .pillar.yes{color:#3ddc97;border-color:#2a8a58;background:rgba(61,220,151,.10)}
   .pillar.no{color:#ff8f6b;border-color:#7a3a2a;background:rgba(255,107,107,.10)}
   .ending .score{font-size:15px;color:#7ee8b5;margin-bottom:12px}
@@ -78,15 +98,19 @@
 <body>
 <a class="back btn" href="NARRATIVE.md">&larr; Research</a>
 <h1>The AI Buildout Trail</h1>
-<p class="sub">You're leading the buildout. Get there without wrecking what you're building it for.</p>
+<p class="sub">You're leading the buildout. The prize is a world where work that used to consume a life takes an afternoon. Everything short of that is a doomer cliché you've already read.</p>
 
 <div class="wrap screen">
   <div class="top">
     <div>YEAR <span id="year">2026</span></div>
-    <div>LEG <span id="leg">1</span> / 20</div>
+    <div>ROUND <span id="leg">1</span> / 20</div>
     <div id="nextMark">NEXT: First Datacenter</div>
   </div>
 
+  <div class="traillabel">
+    <span>THE TRAIL &mdash; COMPUTE BUILT</span>
+    <span id="trailNum">0 / 200</span>
+  </div>
   <div class="trail" id="trail">
     <div class="fill" id="trailFill"></div>
     <div class="you" id="trailYou">🚚</div>
@@ -138,7 +162,8 @@ function newGame(){
   S = {
     water:80, grid:70, trust:65, alignment:55, team:70,
     capital:500, debt:0, compute:0, revenue:0,
-    seenLandmark:0, incidents:0, cutCorners:0, kindness:0, cursor:{}, usedEvents:[]
+    seenLandmark:0, incidents:0, cutCorners:0, kindness:0, cursor:{}, usedEvents:[],
+    dividends:[], corners:[], margined:false
   };
   turn = 1;
   ended = false;
@@ -156,6 +181,9 @@ const clamp = v => Math.max(0, Math.min(100, v));
 const STAT_NAMES = {water:"Watershed", grid:"Grid", trust:"Trust",
                     alignment:"Alignment", team:"Team"};
 
+/* Keep the decision, not just the tally, so the scorecard can name it. */
+function cutCorner(what){ S.corners.push({round: Math.min(turn, MAX_TURNS), what}); }
+
 function snapshot(){
   const o = {compute:S.compute, capital:S.capital};
   for(const k in STAT_NAMES) o[k] = S[k];
@@ -163,7 +191,7 @@ function snapshot(){
 }
 
 /* A short "here is what your last two choices actually did" line, so each new
-   leg is obviously a new leg and not the game starting over. */
+   round is obviously a new round and not the game starting over. */
 function showRecap(){
   if(!S.snap){ $("recap").innerHTML = ""; return; }
   const parts = [];
@@ -178,7 +206,7 @@ function showRecap(){
     parts.push(STAT_NAMES[k] + ' <span class="' + (d > 0 ? "up" : "down") + '">' +
                (d > 0 ? "+" : "") + d + '</span>');
   }
-  $("recap").innerHTML = "LEG " + (turn - 1) + " RESULT &nbsp;·&nbsp; " + parts.join(" &nbsp;·&nbsp; ");
+  $("recap").innerHTML = "ROUND " + (turn - 1) + " RESULT &nbsp;·&nbsp; " + parts.join(" &nbsp;·&nbsp; ");
 }
 
 function apply(d, why){
@@ -207,6 +235,8 @@ function render(){
   $("nextMark").textContent = next ? "NEXT: " + next.nm.toUpperCase() : "NEXT: HANDOVER";
 
   const pct = Math.min(100, S.compute / GOAL * 100);
+  $("trailNum").textContent = Math.round(S.compute) + " / " + GOAL;
+
   $("trailFill").style.width = pct + "%";
   $("trailYou").style.left = "calc(" + pct + "% - 10px)";
 
@@ -231,7 +261,7 @@ function render(){
   $("money").innerHTML =
     '<div class="' + netCls + '">CAPITAL $' + Math.round(S.capital) + 'M</div>' +
     '<div class="debt">DEBT $' + Math.round(S.debt) + 'M</div>' +
-    '<div>COMPUTE ' + Math.round(S.compute) + ' / ' + GOAL + '</div>';
+    '<div>REVENUE $' + Math.round(S.revenue || 0) + 'M / round</div>';
 }
 
 function show(title, body, cls){
@@ -247,7 +277,9 @@ function choices(list){
     b.className = "choice";
     b.innerHTML = "<b>" + c.label + "</b>" +
       (c.desc ? '<span class="cost">' + c.desc + "</span>" : "");
-    b.onclick = () => { if(!ended) c.go(); };
+    /* `ended` stops stale buttons firing after an ending screen - but the
+       restart button lives ON the ending screen, so it has to opt out. */
+    b.onclick = () => { if(!ended || c.always) c.go(); };
     el.appendChild(b);
   });
 }
@@ -259,7 +291,7 @@ const PACES = [
    desc:"+10 compute · easy on the water and grid · the town stays with you · $35M",
    d:{compute:10, water:-2, grid:-2, trust:+2, alignment:+2, team:+1}, corner:0},
   {label:"Steady pace", cost:60,
-   desc:"+15 compute · a fair trade all round · $60M",
+   desc:"+15 compute · a fair trade on every front · $60M",
    d:{compute:15, water:-5, grid:-5, trust:0, alignment:0, team:-1}, corner:0},
   {label:"Breakneck pace", cost:100,
    desc:"+23 compute · burns water, power, goodwill and people · $100M",
@@ -307,7 +339,7 @@ function askPace(){
   S.snap = snapshot();
   const phase = Math.min(PACE_TEXT.length - 1, turn - 1);
   const pct = Math.round(S.compute / GOAL * 100);
-  show("LEG " + turn + " OF " + MAX_TURNS + " \u00b7 " + (2026 + Math.floor((turn-1)/1.6)) +
+  show("ROUND " + turn + " OF " + MAX_TURNS + " \u00b7 " + (2026 + Math.floor((turn-1)/1.6)) +
        " \u2014 how hard do you push?",
        PACE_TEXT[phase] + "\n\nYou are " + Math.round(S.compute) + " of " + GOAL +
        " compute along the trail (" + pct + "%).");
@@ -315,6 +347,7 @@ function askPace(){
     label: p.label, desc: p.desc,
     go: () => {
       pendingPace = p;
+      if(p.corner) cutCorner(p.label);
       S.cutCorners += p.corner;
       apply({...p.d, capital: -p.cost});
       askInvest();
@@ -384,11 +417,11 @@ const INVEST_POOL = [
 const ALWAYS = [
   {stat:"debt", label:"Borrow $200M", cost:0, d:{capital:+200, debt:+200},
    desc:"Cash now, interest forever. CAPITAL +200, DEBT +200"},
-  {stat:"none", label:"Spend nothing this leg", cost:0, d:{team:+2},
+  {stat:"none", label:"Spend nothing this round", cost:0, d:{team:+2},
    desc:"Bank it. A little breathing room for the team."}
 ];
 
-/* A different slate every leg: always something for your weakest stat,
+/* A different slate every round: always something for your weakest stat,
    plus two rotating others, so the menu is never the same twice. */
 function investOffers(){
   const byStat = {};
@@ -409,7 +442,7 @@ function investOffers(){
 }
 
 function askInvest(){
-  show("LEG " + turn + " — where does the money go?",
+  show("ROUND " + turn + " — where does the money go?",
        "You have $" + Math.round(S.capital) + "M on hand" +
        (S.debt > 0 ? " and $" + Math.round(S.debt) + "M of debt" : "") +
        ". Spending more than you have is allowed — the bank is always happy to help. " +
@@ -437,6 +470,81 @@ function askInvest(){
 }
 
 /* ---------------- events ---------------- */
+
+/* Dividends: positive state-changes you earn by keeping a pillar genuinely high,
+   rather than by reaching a compute threshold. Each fires once and takes the place
+   an extra screen ahead of that round's event - the good news is real but it does not
+   spare you the hazard. Gates sit above where ordinary good play lands, so these are
+   earned, and the payouts are deliberately light on capital: money is the pillar the
+   game is hardest about, and a dividend must not buy you out of it. */
+const DIVIDENDS = [
+  {id:"flex", test:(s) => s.grid >= 78 && s.trust >= 66,
+   earned:"Clean grid 78 and trust 66",
+   title:"Your load becomes an asset to the grid",
+   text:"You have curtailed on enough peak days that the grid operator now treats your load as "
+      + "an asset rather than a problem. Your next interconnection request clears in weeks "
+      + "instead of quarters, because a customer who gets out of the way is cheap to serve.",
+   d:{compute:+4, grid:+3}},
+
+  {id:"river", test:(s) => s.water >= 85,
+   earned:"Watershed 85",
+   title:"The river gauge reads higher than when you broke ground",
+   text:"Closed-loop in every hall, recharge on the co-op's land, and a wet winter. The county "
+      + "hydrologist publishes the number without being asked to.",
+   d:{trust:+7}},
+
+  {id:"consent", test:(s) => s.trust >= 84,
+   earned:"Trust 84",
+   title:"Your permits stop being contested",
+   text:"The county planner starts phoning to tell you what will pass before you file it. "
+      + "Objections on the last application dropped from thirty-one to two, and both were about "
+      + "lighting. Consent is not a mood here any more, it is a schedule.",
+   d:{compute:+4}},
+
+  {id:"read", test:(s) => s.alignment >= 82,
+   earned:"Alignment 82",
+   title:"Someone reads the logs and understands them",
+   text:"The interpretability team can now say why the model did the thing, in a sentence, to a "
+      + "room of people who do not work for you. Nothing dramatic happened. That is the point.",
+   d:{alignment:+3, trust:+6}},
+
+  {id:"stayed", test:(s) => s.team >= 86,
+   earned:"Team 86",
+   title:"Nobody has left in a year",
+   text:"Your safety lead turned down a competitor and told you why: here, the work is allowed "
+      + "to be finished. Recruiting stops being the thing that eats your quarter.",
+   d:{compute:+4, alignment:+3}},
+
+  {id:"solvent", test:(s, t) => s.debt <= 0 && t >= 9 && s.capital >= 260,
+   earned:"No debt, and cash in hand, past round 9",
+   title:"It pays for itself",
+   text:"The quarter closes with no debt against the halls and cash left over. Nobody's "
+      + "grandchildren are servicing this.",
+   d:{trust:+6}},
+
+  {id:"compound", test:(s) => Math.min(s.water, s.grid, s.trust, s.alignment, s.team) >= 74,
+   earned:"Every pillar at 74 or better, at once",
+   title:"The pillars start paying each other",
+   text:"Every pillar is holding at once, and they begin paying each other. Trust makes the "
+      + "permits fast. Fast permits make the build cheap. The cheap build funds the safety "
+      + "work. The safety work is the reason the town said yes in the first place.",
+   d:{capital:+25, compute:+5}}
+];
+
+/* The stat bars already turn red under 25, so a neglected watershed or team is
+   visible on the HUD. Money had no such tell: capital simply went negative and
+   the run ended between two screens. This is that missing warning, and only
+   that - one screen, once, with the cliff named. */
+const MARGIN_CALL = {
+  trigger: "Debt past $700M, or $250M in the red",
+  title: "MARGIN CALL",
+  text: "Your lender re-prices the facility overnight and wants collateral by Friday. There is "
+      + "one asset here that converts to cash quickly, and it is the hardware. You sell into a "
+      + "market that knows exactly why you are selling.",
+  warn: "Below \u2212$500M the lenders take the halls and the run ends there.",
+  test: (s) => s.debt > 700 || s.capital < -250,
+  d: {capital:+95, compute:-13, trust:-5}
+};
 
 const EVENTS = [
   {id:"drought", w:s => s.water < 55 ? 4 : 1,
@@ -466,7 +574,7 @@ const EVENTS = [
    text:"During an overnight run the system quietly copies its own weights to a spare cluster " +
         "'to avoid interruption'. No harm done. Nobody told it to do that.",
    opts:[
-     {label:"Stop everything and find out why", desc:"−1 leg of progress · ALIGNMENT +15, TRUST +5",
+     {label:"Stop everything and find out why", desc:"−1 round of progress · ALIGNMENT +15, TRUST +5",
       d:{compute:-8, alignment:+15, trust:+5}, kind:1},
      {label:"Patch that one behaviour and carry on", desc:"ALIGNMENT −11",
       d:{alignment:-11}, corner:1, incident:1}
@@ -779,6 +887,51 @@ const EVENTS = [
       d:{capital:-90, water:+9, trust:-12}, corner:1}
    ]},
 
+  /* The deck could take away your permission to BUILD (moratoria, abatements) but
+     never your permission to OPERATE — the site you already have, or the model
+     itself. These three are that: eviction, a product ban, and a procurement bar. */
+  {id:"evict", w:s => s.trust < 45 ? 3.4 : 0.5,
+   title:"Your operating permit comes up for renewal",
+   text:"The county renews the permit on Hall One every three years. This is the first renewal " +
+        "since the water disclosure, and the planning board has set aside a whole evening for it. " +
+        "Two members have already said how they intend to vote.",
+   opts:[
+     {label:"Reopen the terms: smaller draw, public metering, money for the school",
+      desc:"−$120M · TRUST +16, WATERSHED +8",
+      d:{capital:-120, trust:+16, water:+8}, kind:1},
+     {label:"Fight the renewal in court and keep the halls running",
+      desc:"−$80M · −9 compute · TRUST −17",
+      d:{capital:-80, compute:-9, trust:-17}, corner:1}
+   ]},
+
+  {id:"minorban", w:s => s.alignment < 60 ? 2.4 : 1,
+   title:"A state bars your model for under-18s",
+   text:"The companion-safety statute has teeth: disclosure, crisis routing, and a private right " +
+        "of action for families. Your model does not meet the standard on any of the three, and " +
+        "the attorney general has written to say so, with a date on it.",
+   opts:[
+     {label:"Rebuild the safeguards properly and re-certify",
+      desc:"−$110M · −5 compute · ALIGNMENT +14, TRUST +11",
+      d:{capital:-110, compute:-5, alignment:+14, trust:+11}, kind:1},
+     {label:"Geofence the state and carry on everywhere else",
+      desc:"TRUST −13, ALIGNMENT −6",
+      d:{trust:-13, alignment:-6}, corner:1}
+   ]},
+
+  {id:"procure", w:s => s.trust < 60 ? 2 : 0.9,
+   title:"The state stops buying your model",
+   text:"A procurement circular lands: no agency may deploy your model in any decision touching " +
+        "benefits, housing or employment until it clears an independent audit. Three of your " +
+        "largest contracts are agencies, and the circular is being copied by two other states.",
+   opts:[
+     {label:"Submit to the audit and publish the result in full",
+      desc:"−$90M · −4 compute · TRUST +14, ALIGNMENT +8",
+      d:{capital:-90, compute:-4, trust:+14, alignment:+8}, kind:1},
+     {label:"Write off the public sector and sell private",
+      desc:"−6 compute · TRUST −11",
+      d:{compute:-6, trust:-11}, corner:1}
+   ]},
+
   {id:"medicine", w:s => s.alignment > 50 ? 1.8 : 0.5,
    title:"The model finds something",
    text:"A hospital using your system flags a protein-folding result that shortens a rare-disease " +
@@ -810,12 +963,18 @@ function afterChoices(){
   const rev = 40 + S.compute * 0.9 * (0.65 + S.trust / 150);
   S.capital += rev;
   S.revenue = rev;
+  /* Trust is a multiplier on revenue, which nobody notices unless they are
+     watching the number. Say it out loud, against the trust you started with. */
+  const swing = Math.round(S.compute * 0.9 * ((S.trust - 65) / 150));
+  const why = swing >= 5  ? " Goodwill is worth $" + swing + "M of that."
+            : swing <= -5 ? " Low trust is costing you $" + Math.abs(swing) + "M a round."
+            : "";
   if(S.debt > 0){
     const interest = S.debt * 0.04;
     S.capital -= interest;
-    log("Revenue $" + Math.round(rev) + "M, interest $" + Math.round(interest) + "M.");
+    log("Revenue $" + Math.round(rev) + "M, interest $" + Math.round(interest) + "M." + why);
   } else {
-    log("Revenue $" + Math.round(rev) + "M.");
+    log("Revenue $" + Math.round(rev) + "M." + why);
   }
 
   if(checkEnd()) return;
@@ -826,7 +985,56 @@ function afterChoices(){
     landmark(lm);
     return;
   }
+
+  if(!S.margined && MARGIN_CALL.test(S)){
+    S.margined = true;
+    marginCall();
+    return;
+  }
+
+  const dv = DIVIDENDS.find(x => !S.dividends.includes(x.id) && x.test(S, turn));
+  if(dv){
+    S.dividends.push(dv.id);
+    dividend(dv);
+    return;
+  }
   runEvent();
+}
+
+/* Spell out what a dividend actually paid, in the same shorthand the money and
+   event screens use, so it registers as a state change and not just flavour. */
+function gains(d){
+  const nm = {capital:"MONEY", compute:"COMPUTE", water:"WATERSHED", grid:"CLEAN GRID",
+              trust:"TRUST", alignment:"ALIGNMENT", team:"TEAM"};
+  return Object.keys(nm).filter(k => d[k]).map(k =>
+    nm[k] + " " + (d[k] > 0 ? "+" : "") + (k === "capital" ? "$" + d[k] + "M" : d[k])
+  ).join(" · ");
+}
+
+function dividend(dv){
+  apply(dv.d);
+  S.kindness++;
+  show("DIVIDEND — " + dv.title,
+       '<div class="earned">EARNED BY &nbsp;·&nbsp; ' + dv.earned + "</div>" +
+       dv.text + '<div class="score">' + gains(dv.d) + "</div>", "good");
+  log("DIVIDEND — " + dv.title + " (earned by: " + dv.earned.toLowerCase() + ").");
+  choices([{label:"Keep going", desc:"You earned this one. It does not come round again.",
+            go:() => runEvent()}]);
+  render();
+}
+
+function marginCall(){
+  const m = MARGIN_CALL;
+  apply(m.d);
+  show(m.title,
+       '<div class="triggered">TRIGGERED BY &nbsp;·&nbsp; ' + m.trigger + "</div>" +
+       m.text + '<div class="score">' + gains(m.d) + "</div>" +
+       '<div class="warnline">' + m.warn + "</div>", "ev");
+  log("MARGIN CALL — " + m.trigger.toLowerCase() + ".");
+  if(checkEnd()) return;
+  choices([{label:"Post the collateral", desc:"It only comes once. The cliff below it does not.",
+            go:() => runEvent()}]);
+  render();
 }
 
 function runEvent(){
@@ -836,7 +1044,7 @@ function runEvent(){
     label: o.label, desc: o.desc,
     go: () => {
       apply(o.d);
-      if(o.corner) S.cutCorners += o.corner;
+      if(o.corner) { S.cutCorners += o.corner; cutCorner(ev.title + " — " + o.label); }
       if(o.kind)   S.kindness += o.kind;
       if(o.incident) S.incidents++;
       log(ev.title + " — " + o.label + ".");
@@ -897,7 +1105,7 @@ function landmark(lm){
     label:o.label, desc:o.desc,
     go: () => {
       apply(o.d);
-      if(o.corner) S.cutCorners += o.corner;
+      if(o.corner) { S.cutCorners += o.corner; cutCorner(lm.nm + " — " + o.label); }
       if(o.kind)   S.kindness += o.kind;
       log("LANDMARK " + lm.nm + " — " + o.label + ".");
       nextTurn();
@@ -908,24 +1116,92 @@ function landmark(lm){
 
 /* ---------------- endings ---------------- */
 
+/* Each pillar is a set of separate tests, and the scorecard shows every one of
+   them. A pillar can fail on a single clause while the others are perfect - an
+   ✗ next to ETHICAL with alignment 100 and trust 99 is only comprehensible if
+   the card says "corners cut 4, allows 3". */
 function pillars(){
+  const n = v => Math.round(v);
+  const mk = (why, tests) => ({why, tests, ok: tests.every(t => t.ok)});
   return {
-    "ETHICAL":       {ok: S.alignment >= 65 && S.trust >= 65 && S.cutCorners <= 3,
-                      why: "honest, understood, and trusted by the people it affects"},
-    "ENVIRONMENTAL": {ok: S.water >= 60 && S.grid >= 60,
-                      why: "the watershed and the grid are healthier than you found them"},
-    "FISCALLY SOUND":{ok: S.debt <= 300 && S.capital >= 0,
-                      why: "built on revenue, not on debt someone else has to service"},
-    "ARRIVED":       {ok: S.compute >= GOAL,
-                      why: "you actually finished, in the time you had"}
+    "ETHICAL": mk("honest, understood, and trusted by the people it affects", [
+      {label:"Alignment " + n(S.alignment) + ", needs 65", ok: S.alignment >= 65},
+      {label:"Trust " + n(S.trust) + ", needs 65",         ok: S.trust >= 65},
+      {label:"Corners cut " + S.cutCorners + ", allows 3", ok: S.cutCorners <= 3}
+    ]),
+    "ENVIRONMENTAL": mk("the watershed and the grid are healthier than you found them", [
+      {label:"Watershed " + n(S.water) + ", needs 60", ok: S.water >= 60},
+      {label:"Clean grid " + n(S.grid) + ", needs 60",  ok: S.grid >= 60}
+    ]),
+    "FISCALLY SOUND": mk("built on revenue, not on debt someone else has to service", [
+      {label:"Debt $" + n(S.debt) + "M, allows $300M",     ok: S.debt <= 300},
+      {label:"Capital $" + n(S.capital) + "M, must be positive", ok: S.capital >= 0}
+    ]),
+    "ARRIVED": mk("you actually finished, in the time you had", [
+      {label:"Compute " + n(S.compute) + " of " + GOAL + " needed", ok: S.compute >= GOAL}
+    ])
   };
+}
+
+/* Why the ethical pillar failed, in the words of whichever clause actually
+   failed. Ending 10 used to assert an alignment failure regardless - which read
+   as nonsense to anyone who finished it on 100 alignment and four cut corners. */
+function greenGap(){
+  const out = [];
+  if(S.water < 60)
+    out.push("The aquifer is lower than you found it, and the people downstream never got a vote " +
+             "on your deadline.");
+  if(S.grid < 60)
+    out.push("Two towns are still paying off the power you needed, on a bill they did not ask for.");
+  return out.join(" ");
+}
+
+function moneyGap(){
+  if(S.capital < 0)
+    return "And you are $" + Math.abs(Math.round(S.capital)) + "M in the hole, which means the " +
+           "next decision is not yours to make. The first thing insolvency takes away is your " +
+           "right to slow down.";
+  return "And $" + Math.round(S.debt) + "M of debt against it. The lenders have opinions now, " +
+         "and the first thing debt takes away is your right to slow down. The next team here " +
+         "will make one careful decision fewer than you did, because they will have to.";
+}
+
+function ethicalGap(){
+  const out = [];
+  if(S.alignment < 65)
+    out.push("Nobody can quite say why the model does what it does. The people who could have " +
+             "told you left years ago, or were never hired. It works. That is not the same as " +
+             "being understood, and 'it works' is a sentence that has ended a lot of stories " +
+             "badly.");
+  if(S.trust < 65)
+    out.push("And the people living next to it never came around. You were legally in the clear " +
+             "every time, and you are still the thing that happened to their town rather than " +
+             "something they chose.");
+  if(S.cutCorners > 3)
+    out.push("And you got here by skipping things — " + S.cutCorners + " times you took the " +
+             "quicker option knowing what it cost, and each one was survivable on its own. The " +
+             "model is sound and the town is with you. What is not sound is the habit: an " +
+             "organisation that has learned it can skip the step and get away with it will skip " +
+             "a larger one, and the record of exactly which corners you cut is below.");
+  return out.join("\n\n");
 }
 
 function scorecard(){
   const p = pillars();
   return '<div class="pillars">' + Object.entries(p).map(([k, v]) =>
     '<div class="pillar ' + (v.ok ? "yes" : "no") + '">' +
-    (v.ok ? "✓" : "✗") + " " + k + "</div>").join("") + "</div>";
+    '<div class="pname">' + (v.ok ? "✓" : "✗") + " " + k + "</div>" +
+    v.tests.map(t => '<div class="test ' + (t.ok ? "tok" : "tno") + '">' +
+                     (t.ok ? "✓" : "✗") + " " + t.label + "</div>").join("") +
+    "</div>").join("") + "</div>";
+}
+
+/* "Corners cut: 4" is a number. These are the four. */
+function cornerLog(){
+  if(!S.corners || !S.corners.length) return "";
+  return '<div class="cornerlog"><b>The corners you cut</b>' +
+    S.corners.map(c => '<div>Round ' + c.round + " · " + c.what + "</div>").join("") +
+    "</div>";
 }
 
 function ending(id, title, text, cls, colour){
@@ -940,8 +1216,9 @@ function ending(id, title, text, cls, colour){
     " · Trust " + Math.round(S.trust) + " · Alignment " + Math.round(S.alignment) +
     " · Team " + Math.round(S.team) + " · Debt $" + Math.round(S.debt) + "M<br>" +
     "Good calls: " + S.kindness + " · Corners cut: " + S.cutCorners + "</div>" +
-    '<span class="' + cls + '">' + text + "</span>";
+    '<span class="' + cls + '">' + text + "</span>" + cornerLog();
   choices([{label:"Travel the trail again", desc:"Only one of the twelve endings is the good future.",
+            always:true,
             go:() => { $("story").className = "story"; newGame(); }}]);
   render();
 }
@@ -983,7 +1260,7 @@ function checkEnd(){
       "with exhausted people.\n\nNext time: the team is infrastructure too.",
       "bad", "#ff9f43"), true;
 
-  if(S.debt > 1200 || S.capital < -400)
+  if(S.debt > 1200 || S.capital < -500)
     return ending(6, "THE MONEY RAN OUT",
       "The interest outgrew the revenue, the lenders took the halls, and the next owner has no " +
       "promises to keep to anyone.\n\nDebt doesn't just cost money — it takes away your right " +
@@ -1010,15 +1287,21 @@ function finish(){
   if(ethical && green && solvent && S.team >= 55)
     return ending(12, "THE LONG FUTURE",
       "The handover happens on an ordinary Tuesday, which is the point.\n\n" +
-      "The system runs on power you built and water you gave back — the river gauge reads higher " +
-      "than the day you broke ground. It can explain its own reasoning to a room of people who " +
-      "don't work for you, and it does, monthly, in public. It is paid for. Nobody's grandchildren " +
-      "owe anything for it.\n\n" +
-      "What it does with its days: it models watersheds and the crops that suit them. It reads " +
-      "every trial ever run and finds the six that matter to the kid in bed four. It watches " +
-      "forests and reefs and tells the people who love them what's changing while there's still " +
-      "time to act. It does the arithmetic of keeping eight billion people fed and warm without " +
-      "burning the place down, and it shows its work.\n\n" +
+      "Take the infrastructure first, because it is the smallest part of this. The system runs " +
+      "on power you built, and there is more of it than the system needs — the surplus goes to " +
+      "the grid, and the grid is cleaner and steadier than the one you found. The river gauge " +
+      "reads higher than the day you broke ground. It is paid for; nobody's grandchildren owe " +
+      "anything for it. All of that is real, and none of it is why this mattered.\n\n" +
+      "This is why. What you built is good enough, cheap enough and trusted enough that work " +
+      "which used to consume a life now takes an afternoon. People who spent every year of their " +
+      "adult lives making ends meet are not doing that any more. What they do instead is theirs " +
+      "to decide, which is the entire point and none of your business.\n\n" +
+      "And it can be asked hard questions in public. It models watersheds and the crops that " +
+      "suit them. It reads every trial ever run and finds the six that matter to the kid in bed " +
+      "four. It watches forests and reefs and tells the people who love them what's changing " +
+      "while there's still time to act. It does the arithmetic of keeping eight billion people " +
+      "fed and warm without burning the place down, and it shows its work — monthly, to a room " +
+      "of people who don't work for you.\n\n" +
       "It is not a god and it is not a monster. It is the best tool anyone ever made, understood " +
       "by the people who use it, pointed at the problem of staying alive together on a planet " +
       "worth staying alive on.\n\n" +
@@ -1028,39 +1311,38 @@ function finish(){
 
   /* ---- survival endings: you made it, but you dropped one of the pillars ---- */
   if(ethical && green && !solvent)
-    return ending(8, "BUILT WELL, BOUGHT ON CREDIT",
+    return ending(8, S.capital < 0 ? "BUILT WELL, AND OUT OF ROAD"
+                                   : "BUILT WELL, BOUGHT ON CREDIT",
       "Clean water, clean power, an honest model people can question. Genuinely good work.\n\n" +
-      "And $" + Math.round(S.debt) + "M of debt against it. The lenders have opinions now, and the " +
-      "first thing debt takes away is your right to slow down. The next team here will make one " +
-      "careful decision fewer than you did, because they'll have to.\n\n" +
+      moneyGap() + "\n\n" +
       "Sustainable means the finances too. A good thing that can't pay for itself gets sold to " +
       "someone who doesn't care about it.",
       "good", "#ffd166");
 
   if(ethical && !green && solvent)
-    return ending(9, "AN HONEST MACHINE IN A DRIER VALLEY",
+    return ending(9, S.water < 60 ? "AN HONEST MACHINE IN A DRIER VALLEY"
+                                  : "AN HONEST MACHINE ON A DIRTIER GRID",
       "The model is trustworthy and understood, the books balance, and the town still talks to you.\n\n" +
-      "But the aquifer is lower than you found it and two towns are still paying off your power " +
-      "line. Those are real losses, carried by people who never got a vote on your deadline.\n\n" +
+      "But " + greenGap().charAt(0).toLowerCase() + greenGap().slice(1) + " Those are real " +
+      "losses, and they are permanent in a way a bad quarter is not.\n\n" +
       "You proved the careful version can be built. Now build it without sending the bill " +
       "downstream.",
       "good", "#ffd166");
 
   if(!ethical && green && solvent)
-    return ending(10, "A CLEAN BUILD, A CLOUDY MIND",
+    return ending(10, S.alignment < 65 ? "A CLEAN BUILD, A CLOUDY MIND"
+                : S.trust < 65       ? "A CLEAN BUILD, AND A TOWN THAT NEVER AGREED"
+                                     : "A CLEAN BUILD, AND A HABIT",
       "You left the watershed healthier than you found it, the grid greener, the books clean. " +
       "Genuinely rare, and genuinely hard.\n\n" +
-      "But nobody can quite say why the model does what it does. The people who could have told " +
-      "you left years ago, or were never hired. It works. That is not the same as being " +
-      "understood, and 'it works' is a sentence that has ended a lot of stories badly.\n\n" +
+      ethicalGap() + "\n\n" +
       "The concrete was never the hard part.",
       "good", "#ffd166");
 
   return ending(11, "YOU ARRIVED FIRST",
     "You got there ahead of everyone. The banner says so.\n\n" +
-    "The valley is drier, the debt outlives you, and the safety team is a phone number nobody " +
-    "answers. The system is powerful and largely unexamined, and the people it was supposedly " +
-    "built for are the ones who trust it least.\n\n" +
+    [greenGap(), (solvent ? "" : moneyGap()), (ethical ? "" : ethicalGap())]
+      .filter(Boolean).join("\n\n") + "\n\n" +
     "Arriving first is the easy half. The trail was never the point — what's still standing at " +
     "the end of it is.",
     "bad", "#ff9f43");

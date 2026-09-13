@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The AI Buildout Trail — review</title>
+<style>
+:root{
+  --paper:#faf7f1; --panel:#fffdf9; --edge:#e2dace; --rule:#d3c8b8;
+  --ink:#1f1c18; --soft:#57504608; --dim:#6f665b; --faint:#9b9187;
+  --accent:#9a5b1e; --accent-soft:#f3e3cf; --good:#4a7c3f; --flag:#b0561f;
+  --doc:#2f6b4f; --est:#8a6d1f; --con:#9b4a2f;
+  --serif:Charter,"Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --paper:#15130f; --panel:#1d1a15; --edge:#332d25; --rule:#3b342b;
+  --ink:#ece4d7; --soft:#ffffff08; --dim:#a2968a; --faint:#7d7268;
+  --accent:#e0a44e; --accent-soft:#2e2418; --good:#7fb069; --flag:#d97757;
+  --doc:#7fb069; --est:#d7b45a; --con:#d97757;
+}}
+:root[data-theme=dark]{
+  --paper:#15130f; --panel:#1d1a15; --edge:#332d25; --rule:#3b342b;
+  --ink:#ece4d7; --soft:#ffffff08; --dim:#a2968a; --faint:#7d7268;
+  --accent:#e0a44e; --accent-soft:#2e2418; --good:#7fb069; --flag:#d97757;
+  --doc:#7fb069; --est:#d7b45a; --con:#d97757;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif)}
+
+/* ---------- chrome ---------- */
+header{position:sticky;top:0;z-index:20;background:var(--panel);
+  border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:14px;
+  padding:9px 20px;font-family:var(--sans);font-size:13px}
+header .brand{font-weight:700;letter-spacing:.02em;white-space:nowrap}
+header .brand span{color:var(--accent)}
+.tabs{display:flex;border:1px solid var(--edge);border-radius:6px;overflow:hidden}
+.tabs button{border:0;border-radius:0;background:transparent;padding:5px 13px}
+.tabs button[aria-selected=true]{background:var(--accent);color:var(--paper);font-weight:600}
+.spacer{flex:1}
+button,select,input{font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:var(--panel);border:1px solid var(--edge);border-radius:6px;
+  padding:5px 11px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+.tabs button:hover{color:var(--paper)}
+button.primary{background:var(--accent);color:var(--paper);border-color:var(--accent);
+  font-weight:600}
+button.primary:hover{color:var(--paper);filter:brightness(1.08)}
+button.icon{padding:5px 9px}
+.bar{font-family:var(--sans);font-size:12px;color:var(--dim);background:var(--soft);
+  border-bottom:1px solid var(--edge);padding:6px 20px}
+
+/* ---------- layout ---------- */
+.wrap{display:grid;grid-template-columns:266px minmax(0,1fr);gap:0;
+  max-width:1180px;margin:0 auto}
+.wrap.solo{grid-template-columns:minmax(0,1fr);max-width:940px}
+.wrap.solo nav{display:none}
+nav{position:sticky;top:47px;align-self:start;max-height:calc(100vh - 47px);
+  overflow:auto;padding:26px 18px 60px;font-family:var(--sans);font-size:12.5px;
+  border-right:1px solid var(--edge)}
+nav h3{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  margin:20px 0 8px;font-family:var(--sans);font-weight:600}
+nav h3:first-child{margin-top:0}
+nav a{display:flex;gap:7px;align-items:baseline;color:var(--dim);text-decoration:none;
+  padding:4px 8px;border-radius:5px;border-left:2px solid transparent;line-height:1.35}
+nav a:hover{background:var(--soft);color:var(--ink)}
+nav a.active{color:var(--ink);border-left-color:var(--accent);background:var(--soft)}
+nav a .n{margin-left:auto;font-size:10px;font-weight:700;color:var(--paper);
+  background:var(--flag);border-radius:8px;padding:1px 6px;flex:none}
+article{padding:0 46px 140px;min-width:0}
+
+/* ---------- the paper ---------- */
+.masthead{padding:56px 0 30px;border-bottom:1px solid var(--rule);margin-bottom:8px}
+.masthead .kicker{font-family:var(--sans);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.masthead h1{font-size:41px;line-height:1.1;margin:0 0 6px;letter-spacing:-.015em}
+.front{color:var(--dim);font-size:16px}
+.prose,.front{line-height:1.72;font-size:17.5px;max-width:40em}
+/* the section's own thesis - a deck, not a quotation. No left rule: that
+   belongs to blockquotes, which carry someone else's words. */
+.prose p.standfirst{font-size:19.5px;line-height:1.58;color:var(--ink);
+  padding:0 0 15px;margin:0 0 1.4em;border-bottom:1px solid var(--edge)}
+.prose p,.front p{margin:0 0 1.05em}
+.prose h4,.prose h5{font-family:var(--sans);font-size:14px;margin:1.8em 0 .6em}
+.prose ul,.prose ol,.front ul{padding-left:1.25em;margin:0 0 1.1em}
+.prose li,.front li{margin:.3em 0}
+.prose a,.front a{color:var(--accent);text-underline-offset:2px}
+.prose code,.front code{font-family:var(--mono);font-size:.85em;background:var(--soft);
+  border:1px solid var(--edge);border-radius:4px;padding:.05em .35em}
+.prose blockquote,.front blockquote{margin:1.4em 0;padding:2px 0 2px 20px;
+  border-left:3px solid var(--accent);color:var(--dim);font-style:italic}
+.prose blockquote p{margin:0 0 .7em}
+.prose hr,.front hr{border:0;border-top:1px solid var(--edge);margin:2em 0}
+.prose table,.front table{border-collapse:collapse;width:100%;margin:1.4em 0;
+  font-family:var(--sans);font-size:14px;display:block;overflow-x:auto}
+.prose th,.prose td{border-bottom:1px solid var(--edge);padding:8px 12px;text-align:left;
+  vertical-align:top}
+.prose th{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.tag{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;border:1px solid currentColor;border-radius:3px;
+  padding:1px 5px;white-space:nowrap;vertical-align:.08em}
+.t-doc{color:var(--doc)} .t-est{color:var(--est)} .t-con{color:var(--con)}
+
+/* ---------- chapters ---------- */
+.nothing{color:var(--faint);font-family:var(--sans);font-size:14px;padding:40px 0}
+.chap{padding:26px 0 4px;scroll-margin-top:64px;position:relative}
+.chap.banner{padding:52px 0 0}
+.kicker-rule{font-family:var(--sans);font-size:11.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--rule);
+  padding-bottom:10px;margin-bottom:20px}
+.chap.part{padding-top:52px}
+h2.quiet{font-family:var(--sans);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);font-weight:600}
+.chap.banner h2{font-family:var(--sans);font-size:11.5px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--accent);border-bottom:1px solid var(--rule);
+  padding-bottom:10px}
+.chap-head{display:flex;align-items:flex-start;gap:14px;margin:0 0 14px}
+.chap h2{font-size:25px;line-height:1.25;margin:0;letter-spacing:-.01em;flex:1}
+.mark{font-family:var(--sans);font-size:11.5px;color:var(--faint);background:transparent;
+  border:1px solid transparent;padding:4px 9px;white-space:nowrap;opacity:0;
+  transition:opacity .12s;margin-top:5px}
+.chap:hover .mark,.mark:focus,.mark.on{opacity:1}
+.mark.on{border-color:var(--edge);color:var(--accent)}
+.mark .n{color:var(--flag);font-weight:700}
+
+/* ---------- comments ---------- */
+.threads{margin:16px 0 0;font-family:var(--sans);max-width:40em}
+.threads[hidden]{display:none}
+.cm{background:var(--panel);border:1px solid var(--edge);border-left:3px solid var(--flag);
+  border-radius:6px;padding:10px 13px;margin:0 0 9px}
+.cm.settled{border-left-color:var(--good);opacity:.66}
+.cm .meta{display:flex;gap:9px;align-items:center;font-size:11px;color:var(--faint);
+  margin-bottom:6px}
+.cm p{margin:0;font-size:14px;line-height:1.55;white-space:pre-wrap}
+.cm select{font-size:11px;padding:2px 6px}
+.cm .del{font-size:11px;padding:2px 7px;color:var(--faint)}
+textarea{width:100%;min-height:74px;font-family:var(--sans);font-size:14px;line-height:1.5;
+  background:var(--panel);color:var(--ink);border:1px solid var(--edge);border-radius:6px;
+  padding:10px 12px;resize:vertical}
+textarea:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.compose{display:flex;gap:9px;align-items:center;margin-top:8px}
+.hint{font-size:11px;color:var(--faint)}
+
+/* ---------- game tab ---------- */
+.game{padding:44px 0 0;max-width:40em}
+.game h2{font-size:28px;margin:0 0 4px}
+.game .lede{color:var(--dim);font-size:17.5px;line-height:1.7}
+.game a{color:var(--accent);text-underline-offset:2px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:1px;
+  background:var(--edge);border:1px solid var(--edge);border-radius:8px;overflow:hidden;
+  margin:26px 0;font-family:var(--sans)}
+.facts div{background:var(--panel);padding:13px 14px}
+.facts b{display:block;font-size:21px;color:var(--accent);font-weight:700}
+.facts span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+details.deck{margin-top:26px;font-family:var(--sans);font-size:13.5px}
+details.deck>summary{cursor:pointer;color:var(--dim);padding:9px 0;
+  border-top:1px solid var(--edge)}
+details.deck>summary:hover{color:var(--accent)}
+.item{border-bottom:1px solid var(--edge);padding:11px 2px}
+.item .t{font-weight:600}
+.item .b{color:var(--dim);font-size:13px;margin-top:3px;line-height:1.5}
+.item .opts{color:var(--faint);font-size:12px;margin-top:5px;white-space:pre-wrap}
+
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--edge);
+  border-radius:10px;padding:22px;max-width:520px;width:92%;font-family:var(--sans)}
+dialog::backdrop{background:#0009}
+dialog h3{margin:0 0 6px;font-size:16px}
+dialog p{color:var(--dim);font-size:13px;margin:0 0 4px}
+label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);margin:16px 0 5px}
+.err{color:var(--flag);font-family:var(--sans);font-size:13px}
+@media(max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  nav{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--edge)}
+  article{padding:0 20px 100px}
+  .mark{opacity:1}
+}
+</style></head>
+<body>
+<header>
+  <div class="brand">The AI Buildout <span>Trail</span></div>
+  <div class="tabs" role="tablist">
+    <button id="tab-paper" role="tab" aria-selected="true">The paper</button>
+    <button id="tab-game" role="tab" aria-selected="false">The game</button>
+  </div>
+  <span class="spacer"></span>
+  <select id="filter">
+    <option value="all">read everything</option>
+    <option value="open">only sections with open notes</option>
+    <option value="none">only sections not yet noted</option>
+  </select>
+  <button class="icon" id="theme" title="light / dark">◐</button>
+  <button id="export">write FEEDBACK.md</button>
+  <button class="primary" id="approve">approve →</button>
+</header>
+<div class="bar" id="bar">loading…</div>
+
+<div class="wrap">
+  <nav id="toc"></nav>
+  <article>
+    <div id="paper"></div>
+    <div id="game" hidden></div>
+  </article>
+</div>
+
+<dialog id="dlg">
+  <h3>Approve for publishing</h3>
+  <p>Writes <code>review/APPROVAL.md</code>. Tell Claude it's there and it publishes
+     the shareable Artifact.</p>
+  <label for="target">What should be published?</label>
+  <select id="target" style="width:100%">
+    <option value="NARRATIVE.md — the research document">the paper (NARRATIVE.md)</option>
+    <option value="aitrail.html — the playable game">the game (aitrail.html)</option>
+    <option value="both — paper and game">both</option>
+  </select>
+  <label for="note">Note for Claude (optional)</label>
+  <textarea id="note" placeholder="anything to change before publishing…"></textarea>
+  <div class="compose" style="justify-content:flex-end;margin-top:18px">
+    <button id="cancel">cancel</button>
+    <button class="primary" id="confirm">approve</button>
+  </div>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const api = (u, o) => fetch(u, o).then(r => r.json());
+const esc = t => (t || '').replace(/[&<>]/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[x]));
+const live = c => c.status === 'open' || c.status === 'doing';
+
+const params = new URLSearchParams(location.search);
+let PAPER = null, GAME = null, COMMENTS = [], openThreads = new Set(),
+    view = params.get('view') === 'game' ? 'game' : 'paper';
+
+function byKey(){
+  const m = {};
+  for(const c of COMMENTS) (m[c.section] ||= []).push(c);
+  return m;
+}
+
+/* ---------- theme ---------- */
+const saved = new URLSearchParams(location.search).get('theme') ||
+  (() => { try { return localStorage.getItem('trail-theme'); } catch(e){ return null; } })();
+if(saved) document.documentElement.dataset.theme = saved;
+$('#theme').onclick = () => {
+  const now = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = now;
+  try { localStorage.setItem('trail-theme', now); } catch(e){}
+};
+
+/* ---------- comment block ---------- */
+function threadHTML(key, cs){
+  return '<div class="threads" id="th-' + key + '"' +
+      (openThreads.has(key) ? '' : ' hidden') + '>' +
+    cs.map(c =>
+      '<div class="cm' + (live(c) ? '' : ' settled') + '">' +
+        '<div class="meta"><span>' + c.created.slice(0,16).replace('T',' ') + '</span>' +
+        '<select data-set="' + c.id + '">' +
+          ['open','doing','done','wontfix'].map(s =>
+            '<option' + (s === c.status ? ' selected' : '') + '>' + s + '</option>').join('') +
+        '</select><button class="del" data-del="' + c.id + '">delete</button></div>' +
+        '<p>' + esc(c.text) + '</p></div>').join('') +
+    '<textarea data-new="' + key + '" placeholder="What should change here?"></textarea>' +
+    '<div class="compose"><button data-add="' + key + '">add note</button>' +
+    '<span class="hint">⌘/Ctrl + Enter</span></div></div>';
+}
+
+/* ---------- paper ---------- */
+function renderPaper(){
+  const map = byKey(), mode = $('#filter').value;
+  const chapters = PAPER.chapters.filter(c => {
+    if(c.banner || mode === 'all') return true;
+    const cs = map[c.key] || [];
+    return mode === 'open' ? cs.some(live) : !cs.length;
+  });
+
+  const empty = !chapters.some(c => !c.banner)
+    ? '<p class="nothing">No section matches that filter.</p>' : '';
+
+  $('#paper').innerHTML =
+    '<div class="masthead"><div class="kicker">research spine · in review</div>' +
+    '<h1>' + esc(PAPER.title) + '</h1></div>' +
+    (mode === 'all' ? '<div class="front">' + PAPER.front + '</div>' : '') +
+    empty +
+    chapters.map(c => {
+      const cs = map[c.key] || [], n = cs.filter(live).length;
+      const part = !!c.part;
+      if(c.banner)
+        return '<section class="chap banner" id="s-' + c.key + '"><h2>' + esc(c.title) + '</h2></section>';
+      return '<section class="chap' + (part ? ' part' : '') + '" id="s-' + c.key + '">' +
+        (part ? '<div class="kicker-rule">' + esc(c.title) + '</div>' : '') +
+        '<div class="chap-head"><h2' + (part ? ' class="quiet"' : '') + '>' +
+          esc(part ? 'Preamble' : c.title) + '</h2>' +
+        '<button class="mark' + (n || openThreads.has(c.key) ? ' on' : '') + '" data-mark="' + c.key + '">' +
+          (n ? '<span class="n">' + n + '</span> note' + (n > 1 ? 's' : '') : 'comment') +
+        '</button></div>' +
+        '<div class="prose">' + c.html + '</div>' +
+        threadHTML(c.key, cs) + '</section>';
+    }).join('');
+
+  const groups = [];
+  for(const c of PAPER.chapters){
+    if(c.part) groups.push({label: c.title, items: []});
+    if(c.banner) continue;
+    if(!groups.length) groups.push({label: '', items: []});
+    groups[groups.length - 1].items.push(c);
+  }
+  $('#toc').innerHTML = groups.map(g =>
+    (g.label ? '<h3>' + esc(g.label.replace(/^Part I+ — /, '')) + '</h3>' : '') +
+    g.items.map(c => {
+      const n = (map[c.key] || []).filter(live).length;
+      return '<a href="#s-' + c.key + '" data-nav="' + c.key + '">' +
+        '<span>' + esc(c.part ? 'Preamble'
+          : c.title.replace(/^(\d+)\. /, '$1 · ')) + '</span>' +
+        (n ? '<span class="n">' + n + '</span>' : '') + '</a>';
+    }).join('')).join('');
+
+  spy();
+  // deep links: /#s-narrative:6-the-money... lands on the section, since the
+  // document is built after the browser has already given up on the hash.
+  if(location.hash.startsWith('#s-')){
+    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if(el) el.scrollIntoView({behavior: 'instant'});
+  }
+}
+
+/* ---------- game ---------- */
+function renderGame(){
+  const map = byKey();
+  const count = k => (GAME.find(g => g.id === k) || {sections: []}).sections.length;
+  const cs = map['game:overview'] || [];
+  const deck = GAME.filter(g => g.sections.length && g.id !== 'narrative' && g.id !== 'readme');
+
+  $('#game').innerHTML =
+    '<div class="game"><h2>The game</h2>' +
+    '<p class="lede">The paper is the argument. <a href="/play" target="_blank">The game</a> ' +
+    'is a way of feeling it. You run an AI buildout for twenty legs — each leg you set a ' +
+    'pace, decide where the money goes, and take whatever the deck deals you: a permit ' +
+    'moratorium, a capacity auction that triples everyone\'s bill, a model that scores ' +
+    'safer on evals than it behaves in use.</p>' +
+    '<p class="lede">Four pillars are scored at the end — <b>ethical</b>, ' +
+    '<b>environmental</b>, <b>fiscally sound</b>, <b>arrived</b>. Three of four is the ' +
+    'normal outcome and gets you a survival ending. All four is the only route to ' +
+    'THE LONG FUTURE, and there is no partial credit. That constraint is the whole ' +
+    'argument, in playable form.</p>' +
+    '<div class="facts">' +
+      '<div><b>20</b><span>legs</span></div>' +
+      '<div><b>' + count('events') + '</b><span>events</span></div>' +
+      '<div><b>' + count('endings') + '</b><span>endings</span></div>' +
+      '<div><b>1</b><span>good one</span></div>' +
+    '</div>' +
+    '<p class="lede" style="font-size:15px">Mechanics are done and simulation-verified. ' +
+    'The writing is the weak link — it is flavour text where the paper has sources. ' +
+    'Notes on the game as a whole go here; the deck below is for anything specific.</p>' +
+    '<div class="chap-head" style="margin-top:24px"><h2 style="font-size:19px">Notes on the game</h2>' +
+    '<button class="mark on" data-mark="game:overview">' +
+      (cs.filter(live).length ? '<span class="n">' + cs.filter(live).length + '</span> note' +
+        (cs.filter(live).length > 1 ? 's' : '') : 'comment') +
+    '</button></div>' +
+    threadHTML('game:overview', cs).replace('hidden', '') +
+    deck.map(g => '<details class="deck"><summary>' + esc(g.label.replace('Game — ','')) +
+      ' — ' + g.sections.length + (g.sections.length === 1 ? ' item' : ' items') +
+      '</summary>' +
+      g.sections.map(s => {
+        const scs = map[s.key] || [], n = scs.filter(live).length;
+        return '<div class="item"><div class="chap-head" style="margin:0">' +
+          '<span class="t">' + esc(s.title) + '</span>' +
+          '<button class="mark' + (n ? ' on' : '') + '" data-mark="' + s.key + '">' +
+            (n ? '<span class="n">' + n + '</span>' : 'comment') + '</button></div>' +
+          (s.body ? '<div class="b">' + esc(s.body) + '</div>' : '') +
+          (s.detail.length ? '<div class="opts">' + esc(s.detail.join('\n')) + '</div>' : '') +
+          threadHTML(s.key, scs) + '</div>';
+      }).join('') + '</details>').join('') +
+    '</div>';
+}
+
+function renderBar(){
+  const open = COMMENTS.filter(live).length;
+  const n = PAPER ? PAPER.chapters.filter(c => !c.banner).length : 0;
+  $('#bar').textContent =
+    n + ' sections in the paper · ' + COMMENTS.length + ' notes (' + open +
+    ' open) · saved to review/comments.json';
+}
+
+function render(){
+  if(view === 'paper'){ $('#paper').hidden = false; $('#game').hidden = true; renderPaper(); }
+  else { $('#paper').hidden = true; $('#game').hidden = false; renderGame(); $('#toc').innerHTML = ''; }
+  document.querySelector('.wrap').classList.toggle('solo', view === 'game');
+  renderBar();
+}
+
+async function load(){
+  const [p, g, c] = await Promise.all([
+    api('/api/paper'), api('/api/sections'), api('/api/comments')]);
+  PAPER = p; GAME = g.groups; COMMENTS = c.comments;
+  render();
+}
+
+/* ---------- interaction ---------- */
+async function add(key, ta){
+  const text = (ta.value || '').trim();
+  if(!text) return;
+  await api('/api/comments', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({section: key, text})});
+  openThreads.add(key);
+  await load();
+}
+
+document.addEventListener('click', async e => {
+  const t = e.target.closest('button');
+  if(!t) return;
+  if(t.dataset.mark){
+    const k = t.dataset.mark;
+    openThreads.has(k) ? openThreads.delete(k) : openThreads.add(k);
+    const box = document.getElementById('th-' + k);
+    if(box){
+      box.hidden = !openThreads.has(k);
+      t.classList.toggle('on', openThreads.has(k) || box.querySelector('.cm'));
+      if(!box.hidden) box.querySelector('textarea').focus();
+    }
+    return;
+  }
+  if(t.dataset.add){
+    await add(t.dataset.add,
+      document.querySelector('textarea[data-new="' + CSS.escape(t.dataset.add) + '"]'));
+  }
+  if(t.dataset.del){
+    await api('/api/comments/' + t.dataset.del, {method:'DELETE'});
+    await load();
+  }
+});
+
+document.addEventListener('change', async e => {
+  if(e.target.dataset.set){
+    await api('/api/comments/' + e.target.dataset.set, {method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({status: e.target.value})});
+    await load();
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if((e.metaKey || e.ctrlKey) && e.key === 'Enter' && e.target.dataset.new)
+    add(e.target.dataset.new, e.target);
+});
+
+/* ---------- scroll spy ---------- */
+let spyObs = null;
+function spy(){
+  if(spyObs) spyObs.disconnect();
+  const links = {};
+  document.querySelectorAll('nav a[data-nav]').forEach(a => links[a.dataset.nav] = a);
+  spyObs = new IntersectionObserver(entries => {
+    for(const en of entries){
+      if(!en.isIntersecting) continue;
+      const key = en.target.id.slice(2);
+      Object.values(links).forEach(a => a.classList.remove('active'));
+      if(links[key]) links[key].classList.add('active');
+    }
+  }, {rootMargin: '-60px 0px -70% 0px'});
+  document.querySelectorAll('.chap:not(.banner)').forEach(s => spyObs.observe(s));
+}
+
+$('#tab-paper').onclick = () => { view = 'paper'; setTabs(); render(); };
+$('#tab-game').onclick  = () => { view = 'game';  setTabs(); render(); };
+function setTabs(){
+  $('#tab-paper').setAttribute('aria-selected', view === 'paper');
+  $('#tab-game').setAttribute('aria-selected', view === 'game');
+  $('#filter').style.display = view === 'paper' ? '' : 'none';
+}
+$('#filter').onchange = render;
+$('#export').onclick = async () => {
+  const r = await api('/api/feedback', {method:'POST'});
+  $('#bar').textContent = 'wrote ' + r.written + ' — ' + r.open + ' open notes for Claude';
+};
+$('#approve').onclick = () => $('#dlg').showModal();
+$('#cancel').onclick = () => $('#dlg').close();
+$('#confirm').onclick = async () => {
+  const r = await api('/api/approve', {method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({target: $('#target').value, note: $('#note').value})});
+  $('#dlg').close();
+  $('#bar').textContent = 'wrote ' + r.written + ' — tell Claude to publish the artifact';
+};
+
+if(params.get('filter')) $('#filter').value = params.get('filter');
+if(params.get('open')) params.getAll('open').forEach(k => openThreads.add(k));
+setTabs();
+load();
+</script>
+</body></html>

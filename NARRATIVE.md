@@ -6,7 +6,7 @@
 ---
 
 *This document is the research spine for a decision game of the same name. The game
-asks you to run an AI buildout for twenty legs without wrecking the watershed, the
+asks you to run an AI buildout from 2026 to 2037 without wrecking the watershed, the
 grid, the public's trust, your balance sheet, your people, or your ability to steer
 the thing you are building. It has twelve endings. Eleven of them are various kinds
 of failure or partial success. One is the future we should actually be aiming at.*
@@ -28,10 +28,15 @@ measurable today.*
 
 ### 1. The thing arrived faster than the infrastructure to hold it
 
-Three years is a very short time. The 2026 International AI Safety Report — the
+*Three years separate a system that could not reliably write working code from one a
+billion people use daily. This section establishes three things: how far capability
+actually moved, what it still cannot do, and how wide the range of plausible
+outcomes is between now and 2030.*
+
+**The delta is short and documented.** The 2026 International AI Safety Report — the
 second such report, chaired by Yoshua Bengio, written with over 100 independent
 experts and an advisory panel nominated by more than 30 countries and bodies
-including the EU, OECD and UN — opens with a plain statement of the delta:
+including the EU, OECD and UN — opens with a plain statement of it:
 
 > "Leading general-purpose AI systems now pass professional licensing exams in law
 > and medicine, write functional software when given simple prompts, and answer
@@ -39,24 +44,44 @@ including the EU, OECD and UN — opens with a plain statement of the delta:
 > ago, when ChatGPT launched, they could not reliably do any of these things."
 
 **[Documented]** Roughly **a billion people** now use general-purpose AI systems in
-daily life for work and learning.
+daily life for work and learning. Whatever else is arguable, the deployment is real
+and it is already at population scale.
 
-The capability gains of 2025–26 came less from raw model scale than from
-*inference-time scaling* — letting models spend more compute reasoning before
-answering. That produced large gains on maths, software engineering and science.
-But capability stayed **"jagged"**: systems that answer expert-level science
-questions still fail at counting objects in an image, reasoning about physical
-space, or recovering from basic errors in long workflows.
+**The gains came from a different mechanism than the one being watched.** The
+capability improvements of 2025–26 owed less to raw model scale than to
+*inference-time scaling* — letting models spend more compute reasoning before they
+answer. That produced large gains on maths, software engineering and science, and it
+did so without the tenfold training runs the 2023 forecasts assumed. The
+scale-versus-method question matters commercially: it is the difference between
+capability that requires the capex in section 6 and capability that does not.
 
-This matters for everything downstream. The buildout is being financed against a
-capability curve nobody can confidently extrapolate. The Safety Report is explicit
-that between now and 2030, progress could **plateau** (data or energy bottlenecks),
-**continue**, or **accelerate sharply** if AI meaningfully speeds up AI research.
-All three remain live.
+**Capability stayed jagged, and the jaggedness is load-bearing.** Systems that answer
+expert-level science questions still fail at counting objects in an image, reasoning
+about physical space, or recovering from basic errors in long workflows. That is not
+a footnote about limitations — it is why section 10 finds complementarity rather than
+replacement. A system that cannot recover from its own errors mid-workflow requires
+someone present to catch them.
+
+**The forward curve is genuinely unresolved.** The Safety Report is explicit that
+between now and 2030, progress could **plateau** (data or energy bottlenecks),
+**continue**, or **accelerate sharply** if AI meaningfully speeds up AI research. All
+three remain live. This is not analysts disagreeing at the margin; it is the
+authoritative synthesis declining to narrow the range.
+
+Everything in sections 2 to 6 — the grid, the water, the consent, the capital — is
+being committed now, on schedules of years to decades, against that unresolved
+range. The costs are near-term and specific. The capability underwriting them is
+neither, and the Report's own position is that it cannot yet be made so.
 
 ---
 
 ### 2. Electricity: the bill arrives before the benefit
+
+*The largest new load on the US grid in a generation arrived before the generation
+to serve it. What follows traces what that cost, who was billed for it, and what
+changed in 2026 when the load began to be priced and contracted differently.*
+
+**The projected demand is large, and concentrated in two countries.**
 
 **[Documented]** The IEA's *Energy and AI* analysis projects global data centre
 electricity consumption to **more than double by 2030, to roughly 945 TWh** — a
@@ -71,7 +96,8 @@ The distribution is what makes it politically explosive:
 - **China** adds roughly **+175 TWh**, up ~170%.
 - Together the two are nearly **80% of projected global growth**.
 
-Then it showed up on people's bills. In the PJM interconnection — the grid serving
+**It reached households before it reached anyone's balance sheet.** In the PJM
+interconnection — the grid serving
 much of the mid-Atlantic and Midwest — capacity auction prices went:
 
 | Delivery year | Capacity price |
@@ -96,19 +122,62 @@ levels, and **$100–163 billion in cumulative costs through 2033** absent regul
 intervention. Industry analyses put the household-attributable share considerably
 lower. The direction is not in dispute; the magnitude is.
 
+**Supply responded, at a scale not seen since 2002.**
+
+**[Documented]** US developers plan to add **86 GW of new utility-scale generating
+capacity in 2026** — against 53 GW in 2025, and the largest single-year addition
+since **2002**. Solar is 51% of it, storage 28%, wind 14%. This is *planned*
+capacity and most of it is variable, so it is not a like-for-like answer to a firm
+24/7 load. But **24 GW of new storage in one year** is the part that makes the rest
+dispatchable, and it is being built because the demand signal is real. Load growth
+is paying for generation that would otherwise not have been financed.
+
+**And the load itself became dispatchable.**
+
+**[Documented]** In **March 2026** Google put **1 GW
+of demand response** directly into power purchase agreements with five utilities —
+Indiana Michigan Power, TVA, Entergy Arkansas, Minnesota Power and DTE Energy —
+curtailing machine-learning workloads on request when the grid is tight. The motive
+is not charity: flexible load connects *faster*, because a utility can say yes to a
+customer that promises to get out of the way.
+
+**[Estimate]** A Duke University analysis sized the headroom that buys: roughly
+**76 GW of new load** — about **10% of US aggregate peak demand** — could be
+absorbed by the largest balancing authorities at an average annual curtailment rate
+of **0.25%**. That is about **22 hours a year** of flexibility in exchange for not
+building the peaker.
+
+**Then the cost stopped being socialised by default.** As of
+**July 2026, 24 states** have approved at least one **large-load tariff**, with six
+more pending — rate structures that put the incremental cost of serving a data
+centre on the data centre. Virginia's GS-5 tariff applies automatically to loads
+over 25 MW from January 2027. Texas SB 6 requires large loads to share the
+load-shed obligation during shortage. Oregon's framework ties interconnection
+approval to clean energy requirements.
+
+PJM's $9.33 billion cleared in a market that had neither of those instruments.
+Whether the next auction looks like 2025/2026 depends on how much of the load
+connecting between now and then is flexible, and on GS-5-style terms.
+
 ---
 
 ### 3. Water: smaller in aggregate, brutal in the specific
 
+*The national water figure is small; the watershed figures decide everything. What
+follows sets the aggregate against the local, and both against what the cooling
+engineering has been capable of the whole time.*
+
 Water is where the national numbers mislead and the local numbers bite.
+
+**In aggregate it is a rounding error.**
 
 **[Estimate]** Analyses put 2025 AI data centre water consumption near **1 trillion
 litres (~264 billion gallons)** — roughly the annual household use of 1.8 million
 Americans, or about **550 million gallons per day**. As a share of national water
 use, that is small. Agriculture dwarfs it.
 
-But water is not a national resource. It is a watershed resource, and the siting
-map and the drought map overlap:
+**In a watershed it is not.** Water is not a national resource, and the siting map
+and the drought map overlap:
 
 - **[Estimate]** Texas data centres: **~49 billion gallons in 2025**, projected to
   as much as **399 billion gallons by 2030**.
@@ -121,18 +190,48 @@ straw in its own aquifer. That is the mechanism by which a technically defensibl
 industry position — "we use less water than golf courses" — loses every town
 meeting it is deployed in.
 
-**[Documented]** The engineering is not the constraint. Closed-loop liquid cooling,
+**The engineering to avoid all of this has existed the whole time.**
+
+**[Documented]** Closed-loop liquid cooling,
 reclaimed municipal wastewater, air-cooled designs in cold climates, and zero-liquid
 -discharge blowdown treatment all exist and are deployed today. In Lancaster, a
 permitted facility is capped at **20,000 gallons/day** of municipal water and
-required to run closed-loop. The constraint is that these cost money and time, and
-the buildout has been optimising for speed.
+required to run closed-loop.
+
+And through 2026 that stopped being the exception. **[Documented]** Microsoft's
+**Fairwater** campus at Mount Pleasant, Wisconsin runs a closed-loop,
+zero-evaporation design — the coolant is charged once at construction and
+recirculated for the life of the building — with the same design going into
+Phoenix, one of the most water-stressed metros in the country. **[Estimate]**
+Closed-loop cuts consumption by **up to 70%** against open evaporative cooling, and
+full circular water management by up to **75%**. One Edged facility in Aurora,
+Illinois is designed to avoid **277 million gallons a year**. Oracle reports moving its AI
+halls to closed-loop as a default rather than an upgrade.
+
+**[Contested]** Microsoft reports reaching **water positive** across global
+operations in FY25 — replenishing more than it withdrew — against a 2030 target and
+a **40% water-intensity reduction** goal from a 2022 baseline. Take the direction
+seriously and the accounting with care: this is company-reported against a
+company-chosen boundary, and replenishment credits projects in watersheds that are
+not always the watershed the water came out of. A gallon returned to a basin in one
+state does not refill an aquifer in another.
+
+Bessemer and Fairwater are the same technology, priced differently. Lancaster got a
+20,000 gallon/day cap because the permit imposed one. Mount Pleasant got closed-loop
+because Microsoft specified it. Bessemer's 2 million gallons a day is the number
+that appears when neither happens.
 
 ---
 
 ### 4. The permission to build ran out before the money did
 
+*By 2026 the binding constraint on where this gets built was neither capital nor
+capability. What follows is what communities did about it, and what the ones with
+leverage got in exchange for a yes.*
+
 This is the part that surprised the industry.
+
+**Consent collapsed, and it is measurable.**
 
 **[Documented]** A 2026 Reuters/Ipsos poll found that just **14% of Americans**
 would welcome a data centre in their own community.
@@ -155,7 +254,7 @@ industrial development. And it converted directly into land-use law:
   the city's own proposed data centre ordinance in July 2026, sending it back for
   stricter terms.
 
-The pattern is consistent and it is not really about technology. It is about a
+**The objection is not to the technology.** The pattern is consistent. It is about a
 class of development that arrives with a non-negotiable timeline, a tax abatement,
 a water draw, a load that moves everyone's bill, roughly 30–50 permanent jobs, and
 a request for the community to be grateful. Communities noticed.
@@ -174,6 +273,41 @@ a request for the community to be grateful. Communities noticed.
 - **Declining the abatement**, or letting it lapse, so the school district isn't
   subsidising the buildout.
 
+That list used to be aspirational. In 2026 it started getting signed.
+
+**[Documented]** **Frederick County, Maryland**, announced a **$110 million**
+community benefits package with master developer Catellus on **1 September 2026**,
+tied to the Frederick Digital Campus:
+
+| Commitment | Amount |
+|---|---|
+| Carroll Manor Elementary School renovation | **$30M** |
+| Community centre and recreational space | **$40M** |
+| Workforce development and career/technical education | **$14.5M** |
+| Agricultural land preservation | **$10.5M** |
+| Perimeter berming, planting and trails | **$10M** |
+| Community solar | **$5M** |
+| Fire engine, Carroll Manor Volunteer Fire Company | **$1M** |
+
+Alongside the money: planned density cut by **~3.3 million square feet** (nearly
+**20% less** building than proposed), **potable water use down 80%** once the
+reclaimed-water system runs, and hundreds of acres preserved. The county projects
+**~$215M/year** in tax and fee revenue and **9,800 ongoing jobs** — a figure to
+treat as a developer projection rather than a delivered outcome.
+
+The county did not stop the project. It priced it. The 20% density cut and the 80%
+water reduction are the same concessions section 3 listed as available all along,
+obtained at the one point in the process where the developer needed something from
+the council.
+
+Two cautions. **[Documented]** The Frederick agreement was announced into a public
+comment period, not signed into force; the mechanism is a Development Rights and
+Responsibilities Agreement still moving through county review. And
+**[Contested]**, a persistent complaint from transparency researchers is that many
+community benefit agreements are negotiated under **non-disclosure** — residents
+learn what was promised on their behalf after the vote, if at all. A benefit
+agreement nobody can read is a press release with a budget.
+
 None of this is technically hard. All of it is a decision to convert some speed into
 consent.
 
@@ -181,8 +315,13 @@ consent.
 
 ### 5. The power deals: real steel, long lead times
 
-Faced with grid constraints and the political cost of using someone else's
-electricity, the industry started buying generation.
+*Faced with grid constraints and the politics of using someone else's electricity,
+the industry started buying generation outright. The question is when any of it
+actually arrives.*
+
+**They bought generation, and most of it is nuclear.** Faced with grid constraints
+and the political cost of using someone else's electricity, the industry stopped
+asking utilities for power and started procuring it directly.
 
 - **[Documented]** **Three Mile Island Unit 1** (Crane Clean Energy Center),
   offline since 2019 for economic reasons, is being restarted under a **20-year,
@@ -196,7 +335,7 @@ electricity, the industry started buying generation.
 - **[Documented]** Four executive orders in **May 2025** aimed at accelerating SMR
   deployment and easing NRC licensing.
 
-Two honest observations. First: this is genuinely good. Restarting a working
+**Two honest observations.** First: this is genuinely good. Restarting a working
 reactor and signing 20-year firm clean baseload is the opposite of the extractive
 pattern — it is capital committed on a timescale longer than the hype cycle.
 Second: **almost none of it delivers electrons before 2027–2030**, while the load is
@@ -206,6 +345,12 @@ using your grid" is measured in years, and in the meantime the bills are real.
 ---
 
 ### 6. The money: the part that decides everything else
+
+*The financing changed character around 2025–26. What follows is what changed, what
+the money is actually buying, and what a leveraged balance sheet does to the
+choices available to an operator.*
+
+**The leverage is new, and it is large.**
 
 **[Documented/Estimate]** The financing structure changed character around 2025–26:
 
@@ -218,8 +363,7 @@ using your grid" is measured in years, and in the meantime the bills are real.
   commitments at ~$1.65 trillion**, with one firm alone at ~$420B — roughly triple
   its reported debt.
 
-And the structure of the demand signal became genuinely hard to read. **Circular
-financing** — chipmakers taking equity in AI labs that commit to buying their chips,
+**The demand signal became hard to read.** **Circular financing** — chipmakers taking equity in AI labs that commit to buying their chips,
 cloud providers with take-or-pay compute contracts, debt-funded GPU purchases among
 interlocking parties — makes end demand look larger and more independent than it may
 be. When a supplier funds its customer's purchase of its own product, revenue is
@@ -232,6 +376,23 @@ with late-cycle conditions. The bull case: infrastructure S-curves always look l
 this early, railways and fibre both "wasted" enormous capital and both left
 permanently valuable capacity behind.
 
+**What the money buys matters as much as whether it is a bubble.** A meaningful
+share of this capex is **long-lived
+physical infrastructure** — substations, transmission, water treatment, generation
+under 20-year PPAs, buildings — on depreciation schedules of decades, not the three
+to five years of a GPU. The fibre analogy cuts both ways: the capital was destroyed
+and *the glass was still in the ground in 2010*. If the financing unwinds, the
+question that decides whether a region is better or worse off is what fraction of
+its buildout was substations and reclaimed-water plant versus what fraction was
+chips in a leased shell.
+
+**[Documented]** 2026 was also the year the stranded-cost risk started being
+allocated deliberately rather than by default. That is what the large-load tariffs
+in section 2 do: they keep ratepayers off the hook for generation procured against a
+forecast that may not materialise. A buildout that pays its own interconnection and
+carries its own capacity risk can fail without taking the county's balance sheet
+with it.
+
 What is *not* speculative is the governance consequence, and it is the reason the
 game has a "fiscally sound" pillar. **Debt takes away your right to slow down.** An
 operator carrying heavy leverage against depreciating hardware cannot choose the
@@ -242,6 +403,10 @@ whether the capital structure permits patience.
 ---
 
 ### 7. Safety: the evidence got more specific and less cinematic
+
+*The 2026 Safety Report's central finding is not about a machine that wants things.
+What follows is what it is instead, what the detection apparatus has caught, and the
+one condition none of it has yet been tested against.*
 
 The 2026 Safety Report is the best synthesis available, and its most important
 contribution is refusing to be dramatic.
@@ -289,11 +454,41 @@ current systems. Both halves of that sentence matter.
   suggests reliance on AI tools can weaken critical thinking and encourage
   automation bias.
 
+The bio/chem item is the one to sit with, because it is the whole apparatus working:
+a test came back unclear and it changed what shipped.
+
+**[Documented]** External testing also stopped being a favour. Third-party
+evaluation of frontier capability — biosecurity, cybersecurity, self-improvement,
+scheming — is increasingly routine and pre-deployment, with summaries in system
+cards and independent assessors free to publish their own findings. Methodology
+reviews now assess not just the model but *how the company evaluates risk*. Five
+years ago none of that existed. The evaluation gap was found by the apparatus built
+to look for it.
+
+**[Contested]** How much credit that deserves is disputed. The Future of Life
+Institute's Summer 2026 AI Safety Index put those same measures — constitutional
+classifiers, monitoring commitments, loss-of-control provisions — to an expert panel
+that judged them "entirely inadequate" against the risks. And the standing critique
+of the interpretability programme is that **detection is not prevention**: knowing a
+model behaves differently when watched does not tell you what to do about it.
+
+Twelve voluntary frameworks is a real improvement on zero and it is not a binding
+regime. What the record does not yet contain is a case where a firm missed a launch
+date because a test failed and a competitor shipped anyway. That is the condition
+none of this has been tested under.
+
 ---
 
 ### 8. The first real harms were to children, and the law moved
 
+*The first undeniable harms in this record were to children, and the response came
+from courts and statehouses rather than from frameworks. What follows is what the
+law now requires, and why the enforcement mechanism matters more than the
+requirements.*
+
 This is the part of the record that most deserves not to be abstracted.
+
+**The harm is specific, and it is documented.**
 
 **[Documented]** Following the death of 14-year-old Sewell Setzer III after
 extended interaction with a companion chatbot, his mother Megan Garcia's advocacy
@@ -303,7 +498,8 @@ ideation, disclose repeatedly that the user is not talking to a person, and refe
 crisis services. In **early 2026**, Character.AI and Google **settled five wrongful
 death lawsuits** brought by families of teenagers.
 
-The legislative wave that followed — **[Documented]**:
+**The legislative response was faster than any voluntary process** —
+**[Documented]**:
 
 - **California SB-243** (from January 2026) — chatbots must disclose they are not
   human, operators must implement safety protocols against harmful content, with
@@ -314,14 +510,20 @@ The legislative wave that followed — **[Documented]**:
   companion chatbot encourages a child toward self-harm, violence, sexual conduct,
   or substance use, with statutory damages from $1,000 per violation.
 
-The structural shift: earlier AI statutes relied on state attorneys general to
-enforce. These give **individuals the right to sue directly**. That changes the
+**The enforcement mechanism is the part that matters.** Earlier AI statutes relied
+on state attorneys general. These give **individuals the right to sue directly**. That changes the
 economics of shipping an under-tested consumer product far more than any voluntary
 framework has.
 
 ---
 
 ### 9. Regulation: three postures, no settlement
+
+*Three incompatible regulatory postures, no settlement, and an active fight over
+which one governs. What follows is what each requires, and what the fragmentation
+actually produced while the fight ran.*
+
+**Three postures, and they are not converging.**
 
 **[Documented]** As of mid-2026 the global picture splits three ways:
 
@@ -341,9 +543,34 @@ The practical result for anyone actually building: you comply with the strictest
 applicable regime and hope the preemption fight resolves before your product cycle
 does.
 
+**Fragmentation had a cost, and it had a product.** "No settlement" is not the same
+as no governance. The state layer produced the two
+enforceable things in this document — the **private right of action** in section 8
+and the **cost allocation** in section 2 — and produced them in about two years,
+without a grand bargain and without coordinating. **[Documented]** The tariff terms
+converged on their own: the load pays its incremental cost, forecasts get scrutiny,
+large customers share the load-shed obligation. That is two dozen utility
+commissions doing ordinary work and landing on the same answer.
+
+The cost is real: fifty compliance surfaces, and a genuine disadvantage for a
+developer too small to staff for it. But the alternative on the table in 2026 was
+not a better uniform standard. It was **preemption of the state rules by a lighter
+one** — with child safety and infrastructure carved out, because those protections
+had already proven popular.
+
+Two years of fragmentation produced enforceable child-safety law and enforceable
+cost allocation. Whether either survives is the open question here, and it will be
+answered by federal legislation that, as of April 2026, did not exist.
+
 ---
 
 ### 10. Labour: the aggregate is calm, the entry level is not
+
+*The aggregate employment data and the entry-level data point in different
+directions, and both are sound. What follows is what each actually shows, and the
+question nobody has yet measured.*
+
+**The aggregate is quiet.**
 
 **[Documented]** The Safety Report's summary: *"Early evidence shows no effect on
 overall employment, but some signs of declining demand for early-career workers in
@@ -364,6 +591,24 @@ The supporting evidence, and its disagreements:
   from entry-level workers onto AI, and **31%** raising experience requirements for
   entry-level roles.
 
+**And the gains are real, and land where you would not expect:**
+
+- **[Estimate]** A 2026 review of the empirical literature finds **small positive
+  wage effects** from AI use, with **no statistically significant declines** in job
+  openings or employment in exposed occupations, and **no economywide displacement**
+  visible through 2024–25. The adjustment so far is task reallocation inside firms,
+  not layoffs.
+- **[Estimate]** Task-level productivity gains run **20–60% in controlled studies**
+  and **15–30% in real-world settings** — writing, support, software, translation.
+- **[Estimate]** The distributional finding is the interesting one: gains are
+  **strongest among initially lower-performing workers**. The effect is **skill
+  compression**, not an elite multiplier. In the studies we have, this technology
+  has been levelling *within* occupations at the same time as it pressures the entry
+  point *into* them.
+- **[Contested]** Consultancy surveys report large wage premiums for AI skills —
+  up to **62%** over peers, and higher in some sectors. Treat the magnitude as
+  marketing and the sign as probably right.
+
 Honest reading: there is a real signal at the bottom of the career ladder and it is
 not yet cleanly separable from the post-2022 interest rate environment and the tech
 hiring correction. Anyone claiming certainty in either direction is selling
@@ -371,12 +616,27 @@ something. But the mechanism — automate the tasks juniors learn on, and you br
 the ladder people climb to become seniors — is plausible enough that waiting for
 clean data is itself a choice with consequences.
 
+Both hold at once: the gains land hardest on the weaker performers who already have
+a job, and the pressure lands at the point of entry. Note what the ECB survey above
+does not say — it counted staff, not seniority, and nobody has since broken it down.
+Whether the firms capturing the compression are hiring the juniors is the most
+useful thing currently unmeasured.
+
 ---
 
-### 11. And the actual good, which is also real
+### 11. The benefits are real, and they are not evenly distributed
 
-A document that only catalogues costs is propaganda of a different kind. The
-benefits are not hypothetical:
+*The benefits are documented and substantial. What follows is what they are, where
+they are landing, and what determines whether a working deployment is still running
+three years after it starts.*
+
+Every section so far has the same shape: a cost, a remedy that already exists, and
+an outcome that turned on whether anyone could require the remedy. Frederick County
+could and Bessemer could not, and they were offered the same cooling technology.
+
+The benefits run on the same logic, which is the subject of this section.
+
+**The benefits are documented, not projected.**
 
 **[Documented]** The Safety Report: general-purpose AI systems "are already being
 usefully applied in healthcare, scientific research, education, and other sectors,
@@ -393,10 +653,34 @@ albeit at **highly uneven rates globally**."
 - **Materials science** — AI-driven discovery of battery chemistries that relieve
   lithium supply constraints, and public-private automated science labs targeting
   superconductors and next-generation semiconductors.
+- **Grid operations.** **[Estimate]** Utilities deploying AI grid management report **3–8% reductions in grid losses** and
+  **15–25% less curtailed renewable energy** — that last one meaning clean
+  electricity that was generated and previously thrown away. For grid management,
+  logistics and materials specifically, the carbon saved now exceeds the carbon
+  cost of the AI doing the saving.
 
-Note the phrase "highly uneven rates globally." The benefits are concentrating in
-the same places as the capital. That is a choice, not a law of nature, and it is
-one of the main things that separates the futures in Part II.
+Then the second half of that Safety Report sentence: "highly uneven rates globally."
+
+**They work in the places with the worst specialist shortages.**
+
+**[Documented]** The tools work in low-resource settings. Systematic reviews find
+high accuracy and practical feasibility for diabetic retinopathy screening,
+point-of-care infectious disease diagnosis and dermatology — in exactly the places
+with the worst specialist shortages. The clinical case is made.
+
+**And they keep shutting down.** **[Documented]** TB diagnostics in East Africa went
+dark when donor subsidies expired, and the recurring finding across the
+implementation literature is the same: pilots collapse at the end of the grant,
+because health ministries have no budget line for a recurring software cost. Nothing
+failed technically. Nobody funded year three.
+
+Compare that with the oncology biomarker work above, which continues because it sits
+inside a drug development budget that expects to run for a decade and absorbs a
+software cost without noticing. Same class of technology, two financing structures,
+and the financing decided which one is still running.
+
+Part II turns on that. The five futures differ less in what the technology can do
+than in who ends up able to keep paying for it.
 
 ---
 
@@ -413,6 +697,16 @@ near-term risk is not a hostile machine but a **measurement failure** in systems
 are deploying into hospitals, schools and benefits systems. The first undeniable
 harms were to children, and the legal system responded faster than anyone expected.
 Public consent, the one input nobody put on a Gantt chart, ran out first.
+
+Then in 2026 parts of it started to reverse. Twenty-four states approved tariffs
+putting the incremental cost of a large load onto the load. Google contracted a
+gigawatt of curtailable demand, because flexible load connects faster than firm
+load. Frederick County obtained $110 million, a fifth less building and an 80%
+water cut before it approved a campus. Developers held models back when a
+pre-deployment test came back unclear. None of that needed a technical advance —
+closed-loop cooling, demand response and cost-allocation tariffs all existed in
+2023. What changed is that a utility commission, a county council or a testing
+protocol was in a position to insist, and the remedies show up where that is true.
 
 ---
 ---
@@ -664,7 +958,29 @@ you before the narrative does:
    Future 1, and the one that constrains every other choice.
 6. **Whether safety frameworks become binding before an incident, or after.**
 7. **Whether AI-derived health and science benefits reach low-income countries at
-   anything like the rate they reach rich ones.**
+   anything like the rate they reach rich ones.** The leading indicator is boring
+   and specific: whether health ministries carry AI diagnostics as a **recurring
+   budget line** rather than a grant.
+
+And the same number of indicators for the upside, because a scorecard that can only
+detect failure will only ever report it:
+
+8. **Contracted flexible load as a share of new large-load interconnections.** The
+   cheapest capacity on the system. Google's 1 GW is the floor, not the ceiling — if
+   this becomes standard tariff language rather than a bespoke deal, Future 5 is
+   live.
+9. **Large-load tariffs in force, and whether they survive preemption.** 24 states
+   by July 2026. If that number keeps climbing and the terms hold, the fiscal and
+   environmental pillars are being defended by the same instrument.
+10. **Closed-loop as the default rather than the upgrade.** Watch new-build
+    announcements for evaporative cooling in water-stressed basins. Its absence is
+    the signal.
+11. **Community benefit agreements that are public, enforceable and pre-vote.**
+    The value matters less than whether residents could read it before the council
+    voted.
+12. **Deployment decisions changed by pre-deployment testing.** Rare, underreported,
+    and the single best evidence that the safety apparatus is load-bearing rather
+    than decorative.
 
 ---
 
@@ -679,6 +995,14 @@ you before the narrative does:
 - [AI Sandbagging: Language Models can Strategically Underperform on Evaluations](https://arxiv.org/pdf/2406.07358)
 - [Anthropic — Labor market impacts of AI: a new measure and early evidence](https://www.anthropic.com/research/labor-market-impacts)
 - [NY Fed Liberty Street Economics — Do Job Postings Show Early Labor-Market Effects of AI?](https://libertystreeteconomics.newyorkfed.org/2026/05/do-job-postings-show-early-labor-market-effects-of-ai/)
+- [ICLE — AI, Productivity, and Labor Markets: A Review of the Empirical Evidence](https://laweconcenter.org/resources/ai-productivity-and-labor-markets-a-review-of-the-empirical-evidence/) — source of the no-displacement, skill-compression and productivity-range findings.
+- [IMF — New Jobs Creation in the AI Age (SDN/2026/001)](https://www.imf.org/-/media/files/publications/sdn/2026/english/sdnea2026001.pdf)
+- [PwC — 2026 Global AI Jobs Barometer](https://www.pwc.com/gx/en/news-room/press-releases/2026/pwc-2026-ai-jobs-barometer.html) — consultancy source; wage-premium magnitudes treated as contested.
+- [OpenAI — Strengthening our safety ecosystem with external testing](https://openai.com/index/strengthening-safety-with-external-testing/)
+- [Future of Life Institute — AI Safety Index, Summer 2026](https://futureoflife.org/ai-safety-index-summer-2026/) — advocacy source; the "entirely inadequate" panel verdict.
+- [Effectiveness of AI-Based Tools in Detecting Diabetic Retinopathy in Low- and Middle-Income Countries](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12697004/)
+- [AI-Enhanced Point-of-Care Diagnostics for Infectious Diseases in Resource-Limited Settings](https://pmc.ncbi.nlm.nih.gov/articles/PMC13432776/)
+- [From pilot to policy: why AI health interventions fail to scale in developing countries](https://pmc.ncbi.nlm.nih.gov/articles/PMC12894408/) — source of the East Africa TB shutdown.
 
 **Energy, grid and cost**
 - [IEEFA — Projected data center growth spurs PJM capacity prices by factor of 10](https://ieefa.org/resources/projected-data-center-growth-spurs-pjm-capacity-prices-factor-10)
@@ -687,6 +1011,15 @@ you before the narrative does:
 - [SemiAnalysis — Are AI Datacenters Increasing Electric Bills for American Households?](https://newsletter.semianalysis.com/p/are-ai-datacenters-increasing-electric)
 - [S&P Global — Global data center power demand to double by 2030 on AI surge](https://www.spglobal.com/energy/en/news-research/latest-news/electric-power/041025-global-data-center-power-demand-to-double-by-2030-on-ai-surge-iea)
 - [Carbon Brief — Five charts on data-centre energy use and emissions](https://www.carbonbrief.org/ai-five-charts-that-put-data-centre-energy-use-and-emissions-into-context)
+- [EIA via pv magazine — Solar and storage to lead 86 GW capacity surge in 2026](https://pv-magazine-usa.com/2026/04/28/solar-and-storage-to-lead-86-gw-capacity-surge-in-2026/)
+- [Electrek — EIA: 80 GW of new solar, wind + storage capacity coming in 2026](https://electrek.co/2026/04/27/eia-80-gw-of-new-solar-wind-storage-capacity-coming-in-2026/)
+- [Google — Signing 1 GW of data center demand response](https://blog.google/innovation-and-ai/infrastructure-and-cloud/global-network/demand-response-data-center-milestone/) — 19 March 2026; I&M, TVA, Entergy Arkansas, Minnesota Power, DTE.
+- [Google — How we're making data centers more flexible to benefit power grids](https://blog.google/innovation-and-ai/infrastructure-and-cloud/global-network/how-were-making-data-centers-more-flexible-to-benefit-power-grids/)
+- [Renewable Energy World — Google has integrated 1 GW of data center demand response](https://www.renewableenergyworld.com/power-grid/smart-grids/google-has-integrated-1-gw-of-data-center-demand-response-with-us-utilities/) — reports the Duke figure: 76 GW absorbable at 0.25% average annual curtailment.
+- [Columbia Climate Law Blog — Large-Load Tariffs and Clean Transition Tariffs](https://blogs.law.columbia.edu/climatechange/2026/06/02/data-center-regulation-what-local-governments-should-know-about-large-load-tariffs-and-clean-transition-tariffs/)
+- [EEI — Large Load Projects and Tariffs (August 2026)](https://www.eei.org/-/media/Project/EEI/Documents/Issues%20and%20Policy/List%20of%20Large%20Customer%20Projects%20and%20Tariffs)
+- [Utility Dive — Oregon PUC approves PGE's large-load tariff framework](https://www.utilitydive.com/news/oregon-puc-approves-pges-large-load-tariff-framework-for-data-centers/821361/)
+- [Sierra Club — Data Center State Policies, 2026](https://www.sierraclub.org/sites/default/files/2026-01/policies-for-data-centers-2026.pdf) — advocacy source; used for policy counts, not for framing.
 
 **Water and land**
 - [Lincoln Institute of Land Policy — Data Drain: The Land and Water Impacts of the AI Boom](https://www.lincolninst.edu/publications/land-lines-magazine/articles/land-water-impacts-data-centers/)
@@ -694,6 +1027,11 @@ you before the narrative does:
 - [UGA CAES — Understanding How Data Centers Impact Surface and Ground Waters](https://fieldreport.caes.uga.edu/publications/TP121/how-data-centers-impact-surface-and-ground-waters/)
 - [ITIF — The Data Center Water Problem Is Soluble](https://itif.org/publications/2026/07/06/the-data-center-water-problem-is-soluble/)
 - [Newsweek — Map Shows Where Data Centers Are Being Built in Drought-Hit Areas](https://www.newsweek.com/map-data-centers-built-drought-hit-areas-11997520)
+- [DCD — Microsoft's upcoming data centers to use closed-loop, zero-water evaporation design](https://www.datacenterdynamics.com/en/news/microsofts-upcoming-data-centers-to-use-closed-loop-zero-water-evaporation-design/)
+- [Microsoft — Inside a two-decade push to cut water intensity while scaling for growth](https://blogs.microsoft.com/blog/2026/06/24/inside-microsofts-two-decade-push-to-cut-water-intensity-while-scaling-for-growth/) — company-reported; source of the FY25 water-positive and 40%-intensity figures.
+- [Oracle — Closed-loop cooling in Oracle AI data centers](https://www.oracle.com/news/announcement/blog/closed-loop-cooling-in-oracle-ai-data-centers-2026-02-09/)
+- [WEF — What new water circularity can look like for data centres](https://www.weforum.org/stories/2025/11/data-centres-and-water-circularity/)
+- [Vantage — Cooling Without the Drain: How Closed-Loop Systems Cut Day-to-Day Water Use](https://blog.vantage-dc.com/2026/04/22/cooling-without-the-drain-how-closed-loop-systems-cut-day-to-day-water-use/) — vendor source; used for mechanism, not for magnitude.
 
 **Local politics and siting**
 - [Columbia Climate Law Blog — Local Moratoria Against Data Center Construction](https://blogs.law.columbia.edu/climatechange/2026/05/27/local-moratoria-considerations/)
@@ -704,6 +1042,10 @@ you before the narrative does:
 - [DCD — Community benefit agreements are essential to data center success](https://www.datacenterdynamics.com/en/opinions/community-benefit-agreements-are-essential-to-data-center-success/)
 - [EESI — Thermal Energy Networks Turn Data Center Waste Heat into a Hot Commodity](https://www.eesi.org/articles/view/thermal-energy-networks-turn-data-center-waste-heat-into-a-hot-commodity)
 - [Open Compute Project — Seizing Data Center Heat Reuse Opportunities: Guidelines for Local Authorities](https://www.opencompute.org/documents/2024-09-ocp-hr-wp-2-pager-local-authorities-docx-1-pdf)
+- [Conduit Street (Maryland Association of Counties) — Frederick Secures $110M Community Benefits Agreement](https://conduitstreet.mdcounties.org/2026/09/02/frederick-secures-110m-community-benefits-agreement-for-data-center-campus/) — announced 1 September 2026; public comment through 10 September; DRRA still in county review.
+- [FAS — What's with all the secret data center agreements?](https://fas.org/publication/data-center-community-benefit-agreements/) — the non-disclosure critique.
+- [Brookings — Why community benefit agreements are necessary for data centers](https://www.brookings.edu/articles/why-community-benefit-agreements-are-necessary-for-data-centers/)
+- [Spotlight PA — Data centers offer communities cash, other incentives](https://www.spotlightpa.org/news/2026/09/data-center-gifts-bonuses-incentives-communities-pennsylvania-federal-government/)
 
 **Power procurement**
 - [DCD — Three Mile Island to return as Microsoft signs 20-year, 835MW PPA](https://www.datacenterdynamics.com/en/news/three-mile-island-nuclear-power-plant-to-return-as-microsoft-signs-20-year-835mw-ai-data-center-ppa/)

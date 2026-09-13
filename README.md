@@ -9,6 +9,17 @@ A thought experiment about scaling AI without wrecking what you're building it f
 | **[NARRATIVE.md](NARRATIVE.md)** | The research spine. **Part I** is a sourced narrative of what actually happened 2022–2026 — energy, water, siting politics, financing, safety evidence, regulation, labour. **Part II** projects five possible futures, one of which is the good one. |
 | **[aitrail.html](aitrail.html)** | A playable decision game built on the same material. Open it in any browser; no build step, no dependencies. |
 
+## Reviewing it
+
+```bash
+python3 tools/review_server.py     # http://localhost:8017
+```
+
+Renders `NARRATIVE.md` as a paper — contents rail, evidence tags, one comment
+box per section — and hosts the game alongside it at `/play`. Notes are saved to
+`review/comments.json`; one button writes the open ones out as a work list, the
+other approves the round for publishing. Python standard library only.
+
 ## The four pillars
 
 Both the document and the game are organised around the same test. A buildout has to
@@ -26,8 +37,9 @@ worth wanting.
 
 ## The game
 
-Twenty legs. Each leg you choose a build pace and where the money goes, then face an
-event drawn from a 32-card deck of real scenarios — permit moratoria, transmission
+Twenty rounds, 2026 to 2037. Each round you choose a build pace and where the money
+goes, then face an
+event drawn from a 35-card deck of real scenarios — permit moratoria, transmission
 cost allocation, an open-weights shock, a sycophantic update that raises engagement
 and lowers quality, a model that scores lower on danger evals than it does in
 ordinary use.
